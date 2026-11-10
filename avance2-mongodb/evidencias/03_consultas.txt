@@ -1,0 +1,285 @@
+1) Fichas técnicas y versiones de la película 1
+[
+  {
+    _id: 'FT-P01-V2D',
+    id_pelicula: 1,
+    titulo: 'La ciudad de los sueños',
+    version: {
+      codigo: '2D',
+      formato: '2D Digital',
+      duracion_minutos: 110
+    },
+    idiomas_audio: [
+      'es-CO',
+      'en-US'
+    ],
+    subtitulos: [
+      'es-CO'
+    ]
+  },
+  {
+    _id: 'FT-P01-V3D',
+    id_pelicula: 1,
+    titulo: 'La ciudad de los sueños',
+    version: {
+      codigo: '3D',
+      formato: '3D',
+      duracion_minutos: 110
+    },
+    idiomas_audio: [
+      'es-CO',
+      'en-US'
+    ],
+    subtitulos: [
+      'es-CO'
+    ]
+  },
+  {
+    _id: 'FT-P01-V4D',
+    id_pelicula: 1,
+    titulo: 'La ciudad de los sueños',
+    version: {
+      codigo: '4D',
+      formato: '4D',
+      duracion_minutos: 112
+    },
+    idiomas_audio: [
+      'es-CO',
+      'en-US'
+    ],
+    subtitulos: [
+      'es-CO'
+    ]
+  }
+]
+2) Requisitos registrados para la función 29 (incluye perfil pendiente de Dolby Atmos)
+{
+  id_funcion: 29,
+  id_pelicula: 9,
+  id_sala: 9,
+  proyeccion: {
+    formato: '2D Digital',
+    resolucion: '2K',
+    relacion_aspecto: '2.39:1',
+    audio: 'Estéreo'
+  },
+  requerimientos: [
+    {
+      codigo: 'PROYECCION_DIGITAL',
+      estado: 'registrado',
+      detalle: 'Formato de sala 9 declarado en avance1-postgresql.',
+      obligatorio: true
+    },
+    {
+      codigo: 'DOLBY_ATMOS',
+      estado: 'por_validar',
+      detalle: 'Perfil de ejemplo; avance1 no registra equipos de audio por sala.',
+      obligatorio: false
+    }
+  ],
+  estado_validacion: 'pendiente_revision'
+}
+3) Reseñas recientes de la película 1
+[
+  {
+    _id: 'RE-0021',
+    id_espectador: 21,
+    calificacion: 3,
+    fecha: ISODate('2026-10-20T14:00:00.000Z'),
+    respuesta_empresa: {
+      mensaje: 'Gracias por compartir tu opinión. La tendremos en cuenta para seguir mejorando.',
+      fecha: ISODate('2026-10-21T14:00:00.000Z')
+    }
+  },
+  {
+    _id: 'RE-0011',
+    id_espectador: 11,
+    calificacion: 3,
+    fecha: ISODate('2026-10-19T18:00:00.000Z'),
+    respuesta_empresa: null
+  },
+  {
+    _id: 'RE-0001',
+    id_espectador: 1,
+    calificacion: 3,
+    fecha: ISODate('2026-10-18T15:00:00.000Z'),
+    respuesta_empresa: null
+  }
+]
+4) Aggregation: promedio y cantidad de reseñas por película, unido a la ficha 2D
+[
+  {
+    total_resenas: 3,
+    id_pelicula: 2,
+    titulo: 'Misión en la montaña',
+    promedio: 5
+  },
+  {
+    total_resenas: 3,
+    id_pelicula: 7,
+    titulo: 'Amigos para siempre',
+    promedio: 5
+  },
+  {
+    total_resenas: 3,
+    id_pelicula: 4,
+    titulo: 'Planeta azul',
+    promedio: 4
+  },
+  {
+    total_resenas: 3,
+    id_pelicula: 9,
+    titulo: 'Sombras de medianoche',
+    promedio: 4
+  },
+  {
+    total_resenas: 3,
+    id_pelicula: 1,
+    titulo: 'La ciudad de los sueños',
+    promedio: 3
+  },
+  {
+    total_resenas: 3,
+    id_pelicula: 6,
+    titulo: 'Código secreto',
+    promedio: 3
+  },
+  {
+    total_resenas: 3,
+    id_pelicula: 3,
+    titulo: 'El último viaje',
+    promedio: 2
+  },
+  {
+    total_resenas: 3,
+    id_pelicula: 8,
+    titulo: 'La órbita perdida',
+    promedio: 2
+  },
+  {
+    total_resenas: 3,
+    id_pelicula: 5,
+    titulo: 'La casa del bosque',
+    promedio: 1
+  },
+  {
+    total_resenas: 3,
+    id_pelicula: 10,
+    titulo: 'Aventura en el tiempo',
+    promedio: 1
+  }
+]
+5) Aggregation: incidentes agrupados por tipo y severidad
+[
+  {
+    _id: {
+      tipo: 'seguridad',
+      severidad: 'alta'
+    },
+    cantidad: 3,
+    ultimo_registro: ISODate('2026-10-18T20:27:00.000Z')
+  },
+  {
+    _id: {
+      tipo: 'seguridad',
+      severidad: 'baja'
+    },
+    cantidad: 2,
+    ultimo_registro: ISODate('2026-10-18T20:21:00.000Z')
+  },
+  {
+    _id: {
+      tipo: 'seguridad',
+      severidad: 'critica'
+    },
+    cantidad: 2,
+    ultimo_registro: ISODate('2026-10-18T20:24:00.000Z')
+  },
+  {
+    _id: {
+      tipo: 'seguridad',
+      severidad: 'media'
+    },
+    cantidad: 3,
+    ultimo_registro: ISODate('2026-10-18T20:30:00.000Z')
+  },
+  {
+    _id: {
+      tipo: 'servicio',
+      severidad: 'alta'
+    },
+    cantidad: 2,
+    ultimo_registro: ISODate('2026-10-18T20:23:00.000Z')
+  },
+  {
+    _id: {
+      tipo: 'servicio',
+      severidad: 'baja'
+    },
+    cantidad: 3,
+    ultimo_registro: ISODate('2026-10-18T20:29:00.000Z')
+  },
+  {
+    _id: {
+      tipo: 'servicio',
+      severidad: 'critica'
+    },
+    cantidad: 2,
+    ultimo_registro: ISODate('2026-10-17T20:20:00.000Z')
+  },
+  {
+    _id: {
+      tipo: 'servicio',
+      severidad: 'media'
+    },
+    cantidad: 3,
+    ultimo_registro: ISODate('2026-10-18T20:26:00.000Z')
+  },
+  {
+    _id: {
+      tipo: 'tecnico',
+      severidad: 'alta'
+    },
+    cantidad: 2,
+    ultimo_registro: ISODate('2026-10-17T20:19:00.000Z')
+  },
+  {
+    _id: {
+      tipo: 'tecnico',
+      severidad: 'baja'
+    },
+    cantidad: 3,
+    ultimo_registro: ISODate('2026-10-18T20:25:00.000Z')
+  },
+  {
+    _id: {
+      tipo: 'tecnico',
+      severidad: 'critica'
+    },
+    cantidad: 3,
+    ultimo_registro: ISODate('2026-10-18T20:28:00.000Z')
+  },
+  {
+    _id: {
+      tipo: 'tecnico',
+      severidad: 'media'
+    },
+    cantidad: 2,
+    ultimo_registro: ISODate('2026-10-18T20:22:00.000Z')
+  }
+]
+6) Aggregation: cantidad de perfiles de proyección por formato
+[
+  {
+    _id: '2D Digital',
+    funciones: 20
+  },
+  {
+    _id: '3D',
+    funciones: 6
+  },
+  {
+    _id: '4D',
+    funciones: 4
+  }
+]

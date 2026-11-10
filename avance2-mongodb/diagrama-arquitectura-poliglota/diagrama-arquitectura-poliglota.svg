@@ -1,0 +1,139 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1600" height="1150" viewBox="0 0 1600 1150" role="img" aria-labelledby="titulo descripcion">
+  <title id="titulo">Arquitectura políglota de Cine Bogotá</title>
+  <desc id="descripcion">Diagrama monocromático que resume el núcleo relacional PostgreSQL, la capa documental MongoDB y los identificadores compartidos para integración.</desc>
+  <defs>
+    <marker id="flecha" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#222"/>
+    </marker>
+    <marker id="flecha-inicio" viewBox="0 0 10 10" refX="2" refY="5" markerWidth="7" markerHeight="7" orient="auto">
+      <path d="M 10 0 L 0 5 L 10 10 z" fill="#222"/>
+    </marker>
+    <style>
+      text{font-family:Inter,"Segoe UI",Arial,sans-serif;fill:#171717}
+      .eyebrow{font-size:13px;font-weight:600;letter-spacing:2px;fill:#555}
+      .title{font-size:34px;font-weight:700}
+      .subtitle{font-size:16px;fill:#4a4a4a}
+      .panel-title{font-size:20px;font-weight:700}
+      .panel-sub{font-size:13px;fill:#555}
+      .card-title{font-size:16px;font-weight:700}
+      .card-line{font-size:13px;fill:#333}
+      .small{font-size:12px;fill:#555}
+      .section-title{font-size:19px;font-weight:700}
+      .table-head{font-size:12px;font-weight:700;letter-spacing:.5px}
+      .table-text{font-size:13px}
+      .note{font-size:12px;fill:#444}
+    </style>
+  </defs>
+
+  <rect width="1600" height="1150" fill="#fff"/>
+  <text x="64" y="52" class="eyebrow">CINE BOGOTÁ · AVANCE 2</text>
+  <text x="64" y="101" class="title">Arquitectura políglota de datos</text>
+  <text x="64" y="132" class="subtitle">PostgreSQL gestiona la operación relacional; MongoDB almacena información documental variable.</text>
+  <line x1="64" y1="158" x2="1536" y2="158" stroke="#222" stroke-width="1.5"/>
+
+  <!-- Sistemas -->
+  <rect x="56" y="190" width="704" height="418" rx="8" fill="#fff" stroke="#222" stroke-width="1.5"/>
+  <rect x="840" y="190" width="704" height="418" rx="8" fill="#fff" stroke="#222" stroke-width="1.5"/>
+  <text x="84" y="229" class="panel-title">PostgreSQL</text>
+  <text x="84" y="253" class="panel-sub">Núcleo relacional · avance 1 · fuente de verdad para la operación</text>
+  <text x="868" y="229" class="panel-title">MongoDB</text>
+  <text x="868" y="253" class="panel-sub">Capa documental · avance 2 · documentos de esquema variable</text>
+
+  <rect x="84" y="278" width="648" height="82" rx="5" fill="#f7f7f7" stroke="#777"/>
+  <text x="104" y="305" class="card-title">Catálogo y talento</text>
+  <text x="104" y="330" class="card-line">Pelicula · Clasificacion_Pelicula · Actor_Director · Actor_Director_Pelicula</text>
+  <text x="104" y="349" class="small">IDs: id_pelicula · id_clasificacion_pelicula · id_actor_director</text>
+
+  <rect x="84" y="375" width="648" height="82" rx="5" fill="#f7f7f7" stroke="#777"/>
+  <text x="104" y="402" class="card-title">Programación y salas</text>
+  <text x="104" y="427" class="card-line">Funcion · Sala · Tipo_Sala</text>
+  <text x="104" y="446" class="small">IDs: id_funcion · id_pelicula · id_sala</text>
+
+  <rect x="84" y="472" width="648" height="98" rx="5" fill="#f7f7f7" stroke="#777"/>
+  <text x="104" y="499" class="card-title">Espectadores y boletería</text>
+  <text x="104" y="524" class="card-line">Espectador · Venta · Boleta</text>
+  <text x="104" y="547" class="small">IDs: id_espectador · id_venta · referencias a función y película</text>
+
+  <!-- Enlace de integración, sin imponer relaciones entre motores -->
+  <line x1="774" y1="408" x2="826" y2="408" stroke="#222" stroke-width="2" marker-start="url(#flecha-inicio)" marker-end="url(#flecha)"/>
+  <rect x="782" y="379" width="36" height="22" fill="#fff"/>
+  <text x="800" y="395" text-anchor="middle" class="small" font-weight="700">ID</text>
+
+  <rect x="868" y="278" width="310" height="132" rx="5" fill="#f7f7f7" stroke="#777"/>
+  <text x="888" y="306" class="card-title">fichas_tecnicas_peliculas</text>
+  <text x="888" y="333" class="card-line">id_pelicula · id_clasificacion_pelicula</text>
+  <text x="888" y="355" class="card-line">Versión · elenco · idiomas · subtítulos</text>
+  <text x="888" y="383" class="small">Elenco embebido con id_actor_director</text>
+
+  <rect x="1202" y="278" width="310" height="132" rx="5" fill="#f7f7f7" stroke="#777"/>
+  <text x="1222" y="306" class="card-title">requisitos_proyeccion</text>
+  <text x="1222" y="333" class="card-line">id_funcion · id_pelicula · id_sala</text>
+  <text x="1222" y="355" class="card-line">Formato · audio · resolución · subtítulos</text>
+  <text x="1222" y="383" class="small">Capacidades no confirmadas: por_validar</text>
+
+  <rect x="868" y="430" width="310" height="132" rx="5" fill="#f7f7f7" stroke="#777"/>
+  <text x="888" y="458" class="card-title">resenas_peliculas</text>
+  <text x="888" y="485" class="card-line">id_pelicula · id_espectador</text>
+  <text x="888" y="507" class="card-line">Calificación · texto · fecha · respuesta</text>
+  <text x="888" y="535" class="small">Documento independiente por reseña</text>
+
+  <rect x="1202" y="430" width="310" height="132" rx="5" fill="#f7f7f7" stroke="#777"/>
+  <text x="1222" y="458" class="card-title">reportes_incidentes</text>
+  <text x="1222" y="485" class="card-line">id_funcion · id_sala</text>
+  <text x="1222" y="507" class="card-line">id_venta · id_espectador opcionales</text>
+  <text x="1222" y="535" class="small">Documento independiente por incidente</text>
+
+  <text x="800" y="630" text-anchor="middle" class="small">La aplicación valida las referencias por ID.</text>
+
+  <!-- Mapa de identificadores -->
+  <text x="64" y="657" class="section-title">Identificadores compartidos</text>
+  <text x="64" y="682" class="panel-sub">Las referencias conservan los nombres del modelo PostgreSQL y apuntan a campos escalares en MongoDB.</text>
+
+  <rect x="64" y="706" width="1472" height="38" fill="#ededed" stroke="#222" stroke-width="1"/>
+  <text x="82" y="731" class="table-head">ENTIDAD Y CLAVE EN POSTGRESQL</text>
+  <text x="578" y="731" class="table-head">CAMPO REFERENCIADO EN MONGODB</text>
+  <text x="1054" y="731" class="table-head">COLECCIÓN DE DESTINO</text>
+
+  <g stroke="#aaa" stroke-width="1">
+    <rect x="64" y="744" width="1472" height="39" fill="#fff"/>
+    <rect x="64" y="783" width="1472" height="39" fill="#f8f8f8"/>
+    <rect x="64" y="822" width="1472" height="39" fill="#fff"/>
+    <rect x="64" y="861" width="1472" height="39" fill="#f8f8f8"/>
+    <rect x="64" y="900" width="1472" height="39" fill="#fff"/>
+    <rect x="64" y="939" width="1472" height="39" fill="#f8f8f8"/>
+    <rect x="64" y="978" width="1472" height="39" fill="#fff"/>
+  </g>
+  <g class="table-text">
+    <text x="82" y="769">Pelicula.id_pelicula</text>
+    <text x="578" y="769">id_pelicula</text>
+    <text x="1054" y="769">fichas_tecnicas_peliculas · requisitos_proyeccion · resenas_peliculas</text>
+
+    <text x="82" y="808">Pelicula.id_clasificacion_pelicula</text>
+    <text x="578" y="808">id_clasificacion_pelicula</text>
+    <text x="1054" y="808">fichas_tecnicas_peliculas</text>
+
+    <text x="82" y="847">Actor_Director.id_actor_director</text>
+    <text x="578" y="847">elenco[].id_actor_director</text>
+    <text x="1054" y="847">fichas_tecnicas_peliculas</text>
+
+    <text x="82" y="886">Funcion.id_funcion</text>
+    <text x="578" y="886">id_funcion</text>
+    <text x="1054" y="886">requisitos_proyeccion · reportes_incidentes</text>
+
+    <text x="82" y="925">Funcion.id_pelicula · Funcion.id_sala · Sala.id_sala</text>
+    <text x="578" y="925">id_pelicula · id_sala</text>
+    <text x="1054" y="925">requisitos_proyeccion · reportes_incidentes</text>
+
+    <text x="82" y="964">Espectador.id_espectador</text>
+    <text x="578" y="964">id_espectador</text>
+    <text x="1054" y="964">resenas_peliculas · reportes_incidentes</text>
+
+    <text x="82" y="1003">Venta.id_venta (opcional)</text>
+    <text x="578" y="1003">id_venta</text>
+    <text x="1054" y="1003">reportes_incidentes</text>
+  </g>
+
+  <line x1="64" y1="1052" x2="1536" y2="1052" stroke="#222" stroke-width="1.2"/>
+  <text x="64" y="1080" class="note">MongoDB no impone claves foráneas entre motores. La aplicación debe comprobar la existencia de los IDs en PostgreSQL.</text>
+  <text x="1536" y="1080" text-anchor="end" class="note">Cine Bogotá · Diagrama de integración conceptual</text>
+</svg>

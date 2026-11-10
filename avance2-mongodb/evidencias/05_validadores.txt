@@ -1,0 +1,2 @@
+resenas_peliculas: rechazó documento inválido (código 121).
+fichas_tecnicas_peliculas: rechazó documento inválido (código 121).

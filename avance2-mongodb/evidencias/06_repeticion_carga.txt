@@ -1,0 +1,5 @@
+fichas_tecnicas_peliculas: 30 documentos de semilla verificados; nuevos=0, actualizados=0.
+requisitos_proyeccion: 30 documentos de semilla verificados; nuevos=0, actualizados=0.
+resenas_peliculas: 30 documentos de semilla verificados; nuevos=0, actualizados=0.
+reportes_incidentes: 30 documentos de semilla verificados; nuevos=0, actualizados=0.
+Carga idempotente terminada. Los documentos ajenos a esta semilla no se borraron.

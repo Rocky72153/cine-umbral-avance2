@@ -1,0 +1,5 @@
+Fecha: 2026-11-09
+Docker Engine: 29.9.2
+MongoDB: 8.0.34
+mongosh: 2.14.0
+Entorno: contenedor temporal mongo:8.0; base cine_bogota_avance2

@@ -1,0 +1,5 @@
+Coleccion lista con validador: fichas_tecnicas_peliculas
+Coleccion lista con validador: requisitos_proyeccion
+Coleccion lista con validador: resenas_peliculas
+Coleccion lista con validador: reportes_incidentes
+Base cine_bogota_avance2: cuatro colecciones y seis indices configurados.

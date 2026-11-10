@@ -1,0 +1,4 @@
+fichas_tecnicas_peliculas: 30
+requisitos_proyeccion: 30
+resenas_peliculas: 30
+reportes_incidentes: 30
