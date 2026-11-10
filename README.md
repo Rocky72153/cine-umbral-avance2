@@ -19,10 +19,17 @@ avance2-mongodb/
 │   ├── 03_consultas.txt
 │   ├── 04_conteos.txt
 │   ├── 05_validadores.txt
-│   └── 06_repeticion_carga.txt
+│   ├── 06_repeticion_carga.txt
+│   ├── 01_docker_creacion-y-carga.png
+│   ├── 02_docker_conteos-validadores.png
+│   ├── 03_docker_consultas-query-01-fichas.png
+│   ├── 04_docker_consultas-query-02-requisitos.png
+│   ├── 05_docker_consultas-query-03-resenas.png
+│   ├── 06_docker_consultas-query-04-agregacion-resenas.png
+│   └── 07_docker_consultas-query-05-incidentes.png
 ```
 
-El requisito de evidencias se cumple con capturas de pantalla auténticas tomadas durante la ejecución de MongoDB. Los archivos `.txt` de esta carpeta son registros auxiliares y no sustituyen las capturas. Las imágenes deben mostrar la ejecución real de los tres scripts, los conteos de 30 documentos por colección, las consultas (incluidas agregaciones) y el rechazo de documentos inválidos por los validadores. Deben guardarse como PNG dentro de `avance2-mongodb/evidencias/`. Las capturas todavía están pendientes de la integrante asignada; no se han creado imágenes simuladas.
+La carpeta contiene siete capturas auténticas de la ejecución con Docker: creación de colecciones y carga, resultados de consultas y agregaciones, conteos de 30 documentos por colección, rechazo de documentos inválidos por los validadores y repetición idempotente. Los archivos `.txt` son registros auxiliares que acompañan las capturas.
 
 ![Diagrama de arquitectura políglota](./avance2-mongodb/diagrama-arquitectura-poliglota/diagrama-arquitectura-poliglota.svg)
 
