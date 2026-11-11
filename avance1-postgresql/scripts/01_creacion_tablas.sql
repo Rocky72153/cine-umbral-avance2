@@ -153,3 +153,8 @@ CREATE TABLE Boleta (
     FOREIGN KEY (id_venta) REFERENCES Venta(id_venta),
     FOREIGN KEY (id_tipo_boleta) REFERENCES Tipo_Boleta(id_tipo_boleta)
 );
+
+-- Índices solicitados en la retroalimentación del avance 1.
+CREATE INDEX idx_venta_funcion ON Venta(id_funcion);
+CREATE INDEX idx_boleta_venta ON Boleta(id_venta);
+CREATE INDEX idx_funcion_sala_fecha ON Funcion(id_sala, fecha);

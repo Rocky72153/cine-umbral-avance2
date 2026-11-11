@@ -1,35 +1,44 @@
-# Avance 2 — Capa documental MongoDB
+# Cine Bogotá — Proyecto integrador
 
-Esta guía describe la carpeta de entrega del avance 2 para el repositorio **Cine Bogotá**. El PDF se entrega por separado; no se agrega al repositorio.
+El proyecto reúne el núcleo PostgreSQL del avance 1, la capa documental MongoDB y una primera consulta que integra ambos motores. El informe único se entregará por separado.
+
+Las correcciones y pendientes indicados por el profesor se encuentran en [CORRECCIONES_AVANCE1.md](./CORRECCIONES_AVANCE1.md).
 
 ## Estructura
 
 ```text
-avance2-mongodb/
-├── diagrama-arquitectura-poliglota/
-│   └── diagrama-arquitectura-poliglota.svg
-├── scripts/
-│   ├── 01_creacion_colecciones.js
-│   ├── 02_datos_prueba.js
-│   └── 03_consultas.js
+Cine Bogotá/
+├── avance1-postgresql/               (modelo y scripts SQL)
+├── avance2-mongodb/
+│   ├── diagrama-arquitectura-poliglota/
+│   └── scripts/                      (01, 02 y 03)
+├── integracion/                      (API Python)
 ├── evidencias/
-│   ├── 00_entorno.txt
-│   ├── 01_creacion_colecciones.txt
-│   ├── 02_datos_prueba.txt
-│   ├── 03_consultas.txt
-│   ├── 04_conteos.txt
-│   ├── 05_validadores.txt
-│   ├── 06_repeticion_carga.txt
-│   ├── 01_docker_creacion-y-carga.png
-│   ├── 02_docker_conteos-validadores.png
-│   ├── 03_docker_consultas-query-01-fichas.png
-│   ├── 04_docker_consultas-query-02-requisitos.png
-│   ├── 05_docker_consultas-query-03-resenas.png
-│   ├── 06_docker_consultas-query-04-agregacion-resenas.png
-│   └── 07_docker_consultas-query-05-incidentes.png
+│   ├── postgresql/
+│   └── mongodb/
+├── README.md
+└── REPARTO_AVANCE2.md
 ```
 
-La carpeta contiene siete capturas auténticas de la ejecución con Docker: creación de colecciones y carga, resultados de consultas y agregaciones, conteos de 30 documentos por colección, rechazo de documentos inválidos por los validadores y repetición idempotente. Los archivos `.txt` son registros auxiliares que acompañan las capturas.
+Las evidencias de ambos motores están reunidas en [`evidencias/`](./evidencias/). MongoDB incluye siete capturas reales y registros `.txt` auxiliares. PostgreSQL conserva sus PNG y tres representaciones SVG anteriores de procedimientos; estas últimas no se presentan como capturas de pantalla.
+
+## Primera integración entre bases
+
+`integracion/app.py` expone una API de lectura con Flask. La lista de películas proviene de PostgreSQL; el detalle busca la película por `Pelicula.id_pelicula` y reúne las fichas y reseñas de MongoDB que tienen ese mismo `id_pelicula`. No modifica ventas ni llama los procedimientos transaccionales del avance 1.
+
+Con Python instalado, ambas bases encendidas y sus scripts de creación y datos ejecutados (para PostgreSQL, en una base vacía, ejecutar `01_creacion_tablas.sql` y `02_datos_prueba.sql`), desde la raíz del repositorio:
+
+```powershell
+python -m venv .venv
+.\.venv\Scripts\Activate.ps1
+python -m pip install -r integracion/requirements.txt
+$env:POSTGRES_URL = 'postgresql://USUARIO:CLAVE@localhost:5432/cine_bogota'
+$env:MONGODB_URI = 'mongodb://localhost:27017'
+$env:MONGODB_DATABASE = 'cine_bogota_avance2'
+python -m flask --app integracion.app run
+```
+
+Sustituye `USUARIO` y `CLAVE` por los de tu instalación sin guardarlos en el repositorio. Visita `http://127.0.0.1:5000/api/peliculas` para el catálogo y `http://127.0.0.1:5000/api/peliculas/1` para un detalle integrado. Si una base no está disponible, la API devuelve un error 503; una película inexistente en PostgreSQL devuelve 404. Es una base de integración de lectura, no una aplicación de ventas ni un despliegue público.
 
 ![Diagrama de arquitectura políglota](./avance2-mongodb/diagrama-arquitectura-poliglota/diagrama-arquitectura-poliglota.svg)
 

@@ -3,7 +3,7 @@
 ## Descripción del proyecto
 
 - **Proyecto:** Cine Bogotá.
-- **Enfoque de programación del sistema:** Programación Orientada a Objetos (POO).
+- **Enfoque de la cartelera:** pendiente de definir por el equipo; el profesor aclaró que se refiere al tipo de películas programadas.
 - **Ciudad:** Bogotá, Colombia.
 - **Modalidad de operación:** una sede con proyección digital y formatos 3D y 4D; las ventas de boletería son registradas exclusivamente por el staff.
 - **Capacidad estimada:** 2.000 espectadores en 20 salas de 100 puestos cada una.
@@ -19,4 +19,4 @@ Se parte de las ocho entidades solicitadas y se amplía el modelo con **Pelicula
 - `modelo-er/`: diagrama entidad–relación.
 - `modelo-relacional/`: modelo relacional en 3FN y documentación de claves y reglas.
 - `scripts/`: scripts SQL del avance (01 a 05).
-- `evidencias/`: pruebas y evidencias de la ejecución de los scripts.
+- [`../evidencias/postgresql/`](../evidencias/postgresql/): evidencias del núcleo PostgreSQL reunidas en la carpeta común del proyecto.

@@ -1,5 +1,7 @@
 # Modelo entidad–relación · Cine Bogotá
 
+**Corrección pendiente:** el profesor solicitó incorporar Tipo_Boleta, corregir la cardinalidad Espectador–Venta y añadir los atributos faltantes. El diagrama mostrado aún corresponde a la entrega anterior.
+
 ![Diagrama entidad-relación de Cine Bogotá](proyecto_cine-modelo-entidad-relacion.drawio.png)
 
 - [Abrir o descargar el diagrama](proyecto_cine-modelo-entidad-relacion.drawio.png)

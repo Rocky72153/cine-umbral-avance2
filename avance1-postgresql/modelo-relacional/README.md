@@ -1,9 +1,11 @@
 # Modelo relacional en tercera forma normal · Cine Bogotá
 
+**Corrección pendiente:** el diagrama debe reflejar `Venta.monto_total` y `Actor_Director.correo` y revisar las cardinalidades señaladas por el profesor.
+
 ![Diagrama del modelo relacional 3FN de Cine Bogotá](modelo-relacional.drawio.png)
 
 - [Abrir o descargar el diagrama](modelo-relacional.drawio.png)
-- [Consultar las relaciones, claves y justificación de 3FN](modelo-relacional-3fn.md)
+- [Consultar las tablas y claves implementadas](../scripts/01_creacion_tablas.sql)
 - [Ver el modelo entidad–relación](../modelo-er/README.md)
 
 ## Decisiones de modelado
