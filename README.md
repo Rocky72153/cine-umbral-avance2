@@ -42,6 +42,8 @@ Sustituye `USUARIO` y `CLAVE` por los de tu instalación sin guardarlos en el re
 
 ![Diagrama de arquitectura políglota](./avance2-mongodb/diagrama-arquitectura-poliglota/diagrama-arquitectura-poliglota.svg)
 
+[Abrir el diagrama en PNG](./avance2-mongodb/diagrama-arquitectura-poliglota/diagrama-arquitectura-poliglota.png) · [Abrir el SVG editable](./avance2-mongodb/diagrama-arquitectura-poliglota/diagrama-arquitectura-poliglota.svg)
+
 ## Ejecución con Docker Desktop
 
 Desde la raíz del repositorio, con Docker Desktop iniciado:
@@ -81,7 +83,7 @@ Los IDs documentados se cotejaron con `avance1-postgresql/scripts/01_creacion_ta
 | `fichas_tecnicas_peliculas` | `Pelicula.id_pelicula`, `Pelicula.id_clasificacion_pelicula`, `Actor_Director.id_actor_director` | 30 versiones: 3 por película para las 10 películas |
 | `requisitos_proyeccion` | `Funcion.id_funcion`, `Funcion.id_pelicula`, `Funcion.id_sala` | 30: una por función |
 | `resenas_peliculas` | `Pelicula.id_pelicula`, `Espectador.id_espectador` | 30 |
-| `reportes_incidentes` | `Funcion.id_funcion`, `Sala.id_sala`; opcionales `Venta.id_venta` y `Espectador.id_espectador` | 30 |
+| `reportes_incidentes` | `Funcion.id_funcion`, `Sala.id_sala`; opcionales `Venta.id_venta`, `Espectador.id_espectador` y `Staff.id_staff` en `reportado_por` | 30 |
 
 La integración final debe validar que estos IDs existan en PostgreSQL desde la aplicación que escriba los documentos. El `id_venta` de un incidente es opcional.
 
