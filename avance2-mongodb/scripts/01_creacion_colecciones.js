@@ -1,173 +1,179 @@
-// Colecciones y validadores del avance 2 de Cine Bogotá.
-// Ejecutar con mongosh; el script se puede volver a ejecutar sin borrar datos.
-const cineDB = db.getSiblingDB("cine_bogota_avance2");
+//Colección de fichas tecnicas
+db.createCollection("fichas_tecnicas_peliculas");
 
-const schemas = {
-  fichas_tecnicas_peliculas: {
-    bsonType: "object",
-    required: ["_id", "id_pelicula", "titulo", "id_clasificacion_pelicula", "pais_origen", "version", "elenco", "idiomas_audio", "subtitulos", "clasificaciones_por_pais"],
-    properties: {
-      _id: { bsonType: "string" },
-      id_pelicula: { bsonType: ["int", "long", "double"] },
-      titulo: { bsonType: "string", minLength: 1 },
-      id_clasificacion_pelicula: { bsonType: ["int", "long", "double"] },
-      pais_origen: { bsonType: "string" },
-      version: {
-        bsonType: "object",
-        required: ["codigo", "formato", "duracion_minutos"],
-        properties: {
-          codigo: { bsonType: "string" },
-          formato: { enum: ["2D Digital", "3D", "4D", "IMAX"] },
-          duracion_minutos: { bsonType: ["int", "long", "double"], minimum: 1 }
-        }
-      },
-      elenco: {
-        bsonType: "array",
-        items: {
-          bsonType: "object",
-          required: ["id_actor_director", "nombre", "rol_en_pelicula"],
-          properties: {
-            id_actor_director: { bsonType: ["int", "long", "double"] },
-            nombre: { bsonType: "string" },
-            rol_en_pelicula: { enum: ["actuacion", "direccion"] }
-          }
-        }
-      },
-      idiomas_audio: { bsonType: "array", items: { bsonType: "string" }, minItems: 1 },
-      subtitulos: { bsonType: "array", items: { bsonType: "string" } },
-      clasificaciones_por_pais: {
-        bsonType: "array",
-        minItems: 1,
-        items: {
-          bsonType: "object",
-          required: ["pais", "sistema", "etiqueta"],
-          properties: {
-            pais: { bsonType: "string" },
-            sistema: { bsonType: "string" },
-            etiqueta: { bsonType: "string" },
-            id_clasificacion_pelicula: { bsonType: ["int", "long", "double"] }
-          }
-        }
-      },
-      actualizado_en: { bsonType: "date" }
-    }
+db.fichas_tecnicas_peliculas.insertMany([
+  {
+    id_pelicula: 201,
+    elenco: [
+      { rol: "Actriz Principal", nombre: "Alison Lohman" },
+      { rol: "Director", nombre: "Sam Raimi" }
+    ],
+    duracion_por_version: { cine: "99 min" },
+    idiomas_y_subtitulos: { audio: ["Inglés", "Español Latino"], subtitulos: ["Español", "Inglés"] }
   },
-  requisitos_proyeccion: {
-    bsonType: "object",
-    required: ["_id", "id_funcion", "id_pelicula", "id_sala", "fecha_funcion", "proyeccion", "requerimientos", "estado_validacion"],
-    properties: {
-      _id: { bsonType: "string" },
-      id_funcion: { bsonType: ["int", "long", "double"] },
-      id_pelicula: { bsonType: ["int", "long", "double"] },
-      id_sala: { bsonType: ["int", "long", "double"] },
-      fecha_funcion: { bsonType: "date" },
-      proyeccion: {
-        bsonType: "object",
-        required: ["formato", "resolucion", "audio"],
-        properties: {
-          formato: { enum: ["2D Digital", "3D", "4D"] },
-          resolucion: { bsonType: "string" },
-          relacion_aspecto: { bsonType: "string" },
-          audio: { bsonType: "string" }
-        }
-      },
-      requerimientos: {
-        bsonType: "array",
-        items: {
-          bsonType: "object",
-          required: ["codigo", "estado"],
-          properties: {
-            codigo: { bsonType: "string" },
-            estado: { enum: ["registrado", "por_validar", "no_soportado"] },
-            detalle: { bsonType: "string" },
-            obligatorio: { bsonType: "bool" }
-          }
-        }
-      },
-      estado_validacion: { enum: ["registrado", "pendiente_revision"] },
-      observado_en: { bsonType: "date" }
-    }
+  {
+    id_pelicula: 202,
+    elenco: [
+      { rol: "Actor Principal", nombre: "Ryunosuke Kamiki" },
+      { rol: "Directora", nombre: "Mone Kamishiraishi" },
+      { rol: "Director", nombre: "Makoto Shinkai" }
+    ],
+    duracion_por_version: { estandar: "112 min" },
+    idiomas_y_subtitulos: { audio: ["Japonés", "Español Latino"], subtitulos: ["Español"] }
   },
-  resenas_peliculas: {
-    bsonType: "object",
-    required: ["_id", "id_pelicula", "id_espectador", "calificacion", "texto", "fecha", "respuesta_empresa"],
-    properties: {
-      _id: { bsonType: "string" },
-      id_pelicula: { bsonType: ["int", "long", "double"] },
-      id_espectador: { bsonType: ["int", "long", "double"] },
-      calificacion: { bsonType: ["int", "long", "double"], minimum: 1, maximum: 5 },
-      texto: { bsonType: "string", minLength: 1 },
-      fecha: { bsonType: "date" },
-      respuesta_empresa: {
-        bsonType: ["object", "null"],
-        properties: {
-          mensaje: { bsonType: "string" },
-          fecha: { bsonType: "date" }
-        }
-      }
-    }
+  {
+    id_pelicula: 203,
+    elenco: [
+      { rol: "Actriz Principal", nombre: "Erika Sawajiri" },
+      { rol: "Directora", nombre: "Mika Ninagawa" }
+    ],
+    duracion_por_version: { estandar: "120 min" },
+    idiomas_y_subtitulos: { audio: ["Japonés"], subtitulos: ["Español", "Inglés"] }
   },
-  reportes_incidentes: {
-    bsonType: "object",
-    required: ["_id", "tipo", "id_funcion", "id_sala", "fecha", "severidad", "estado", "descripcion", "detalles", "reportado_por"],
-    properties: {
-      _id: { bsonType: "string" },
-      tipo: { enum: ["tecnico", "servicio", "seguridad"] },
-      id_funcion: { bsonType: ["int", "long", "double"] },
-      id_sala: { bsonType: ["int", "long", "double"] },
-      id_venta: { bsonType: ["int", "long", "double", "null"] },
-      id_espectador: { bsonType: ["int", "long", "double", "null"] },
-      fecha: { bsonType: "date" },
-      severidad: { enum: ["baja", "media", "alta", "critica"] },
-      estado: { enum: ["abierto", "en_revision", "cerrado"] },
-      descripcion: { bsonType: "string", minLength: 1 },
-      detalles: { bsonType: "object" },
-      reportado_por: {
-        bsonType: "object",
-        required: ["tipo"],
-        properties: {
-          tipo: { enum: ["staff", "espectador", "sistema"] },
-          id_staff: { bsonType: ["int", "long", "double"] }
-        }
-      },
-      actualizado_en: { bsonType: "date" }
-    }
+  {
+    id_pelicula: 204,
+    elenco: [
+      { rol: "Actor Principal", nombre: "Jim Carrey" },
+      { rol: "Actriz Principal", nombre: "Kate Winslet" },
+      { rol: "Director", nombre: "Michel Gondry" }
+    ],
+    duracion_por_version: { estandar: "108 min" },
+    idiomas_y_subtitulos: { audio: ["Inglés", "Español"], subtitulos: ["Español"] }
+  },
+  {
+    id_pelicula: 205,
+    elenco: [
+      { rol: "Actriz Principal", nombre: "Vera Farmiga" },
+      { rol: "Actor Principal", nombre: "Patrick Wilson" },
+      { rol: "Director", nombre: "James Wan" }
+    ],
+    duracion_por_version: { estandar: "112 min" },
+    idiomas_y_subtitulos: { audio: ["Inglés", "Español Latino"], subtitulos: ["Español"] }
   }
-};
+]);
 
-for (const [nombre, esquema] of Object.entries(schemas)) {
-  const info = cineDB.getCollectionInfos({ name: nombre })[0];
-  if (info) {
-    const resultado = cineDB.runCommand({
-      collMod: nombre,
-      validator: { $jsonSchema: esquema },
-      validationLevel: "strict",
-      validationAction: "error"
-    });
-    if (resultado.ok !== 1) {
-      throw new Error(`No se pudo actualizar el validador de ${nombre}: ${tojson(resultado)}`);
-    }
-  } else {
-    cineDB.createCollection(nombre, {
-      validator: { $jsonSchema: esquema },
-      validationLevel: "strict",
-      validationAction: "error"
-    });
+//Colección de requisistos de proyección
+db.createCollection("requisitos_proyeccion");
+
+db.requisitos_proyeccion.insertMany([
+  {
+    id_funcion: 601,
+    formato: "2D Estándar",
+    requerimientos_audio: "Dolby Digital 5.1 (Realce en efectos de terror y sobresaltos)",
+    detalles_tecnicos: { proyector: "Digital 2K", lentes_requeridos: false }
+  },
+  {
+    id_funcion: 602,
+    formato: "IMAX 2D",
+    requerimientos_audio: "Dolby Atmos (Optimizado para banda sonora musical)",
+    detalles_tecnicos: { proyector: "Láser 4K IMAX", lentes_requeridos: false }
+  },
+  {
+    id_funcion: 603,
+    formato: "Digital Estándar",
+    requerimientos_audio: "Surround 7.1",
+    detalles_tecnicos: { proyector: "Digital 2K", control_luces_sala: "atenuado" }
+  },
+  {
+    id_funcion: 604,
+    formato: "Ciclo de Cine Arte",
+    requerimientos_audio: "Estéreo amplificado",
+    detalles_tecnicos: { proyector: "Restaurado HD", formato_proyeccion: "1.85:1" }
+  },
+  {
+    id_funcion: 605,
+    formato: "Sala Macro XE / Terror",
+    requerimientos_audio: "Dolby Atmos (Graves profundos para escenas de tensión)",
+    detalles_tecnicos: { proyector: "Dual Láser 4K", aislamiento_acustico: "reforzado" }
   }
-  print(`Coleccion lista con validador: ${nombre}`);
-}
+]);
 
-const indices = [
-  ["fichas_tecnicas_peliculas", { id_pelicula: 1, "version.codigo": 1 }, { unique: true, name: "uk_pelicula_version" }],
-  ["requisitos_proyeccion", { id_funcion: 1 }, { unique: true, name: "uk_requisitos_funcion" }],
-  ["resenas_peliculas", { id_pelicula: 1, fecha: -1 }, { name: "ix_resenas_pelicula_fecha" }],
-  ["resenas_peliculas", { id_espectador: 1 }, { name: "ix_resenas_espectador" }],
-  ["reportes_incidentes", { tipo: 1, fecha: -1 }, { name: "ix_incidentes_tipo_fecha" }],
-  ["reportes_incidentes", { id_funcion: 1, id_sala: 1 }, { name: "ix_incidentes_funcion_sala" }]
-];
+//Colección de reseñas de peliculas
+db.createCollection("resenas_peliculas");
 
-for (const [coleccion, claves, opciones] of indices) {
-  cineDB.getCollection(coleccion).createIndex(claves, opciones);
-}
+db.resenas_peliculas.insertMany([
+  {
+    id_pelicula: 201,
+    id_espectador: 901,
+    calificacion: 4,
+    texto_libre: "¡De lo mejor de Sam Raimi! Mezcla perfecta de horror y comedia negra.",
+    fecha: new Date("2026-10-10T22:00:00Z"),
+    respuesta_empresa: "¡Totalmente de acuerdo! Una montaña rusa de sustos."
+  },
+  {
+    id_pelicula: 202,
+    id_espectador: 902,
+    calificacion: 5,
+    texto_libre: "Visualmente impresionante y una historia que te llega al corazón.",
+    fecha: new Date("2026-10-12T19:30:00Z")
+  },
+  {
+    id_pelicula: 203,
+    id_espectador: 903,
+    calificacion: 4,
+    texto_libre: "Una locura visual muy intensa y cruda sobre la fama y la obsesión.",
+    fecha: new Date("2026-10-15T21:15:00Z"),
+    respuesta_empresa: "Gracias por tu opinión sobre este título de culto."
+  },
+  {
+    id_pelicula: 204,
+    id_espectador: 904,
+    calificacion: 5,
+    texto_libre: "Una obra maestra sobre el amor, la memoria y el dolor de olvidar.",
+    fecha: new Date("2026-10-18T18:00:00Z")
+  },
+  {
+    id_pelicula: 205,
+    id_espectador: 905,
+    calificacion: 5,
+    texto_libre: "El cine de terror moderno en su máxima expresión. Los sustos están muy bien logrados.",
+    fecha: new Date("2026-10-20T23:00:00Z"),
+    respuesta_empresa: "¡Gracias por visitarnos! Esperamos que hayas dormido bien después de la función."
+  }
+]);
 
-print(`Base ${cineDB.getName()}: cuatro colecciones y seis indices configurados.`);
+//Colección de fichas tecnicas
+db.createCollection("reportes_incidentes");
+
+db.reportes_incidentes.insertMany([
+  {
+    id_sala: 2,
+    id_funcion: 601,
+    id_staff: 14,
+    tipo_incidente: "Falla técnica",
+    detalles_especificos: { equipo: "Sistema de sonido", descripcion: "Alerta de volumen alto durante el clímax de la película de terror." },
+    fecha_reporte: new Date("2026-10-10T23:45:00Z")
+  },
+  {
+    id_sala: 5,
+    id_funcion: 602,
+    id_staff: 19,
+    tipo_incidente: "Queja de servicio",
+    detalles_especificos: { area: "Taquilla", descripcion: "Larga fila de espectadores buscando entradas para la función de estreno." },
+    fecha_reporte: new Date("2026-10-12T18:30:00Z")
+  },
+  {
+    id_sala: 1,
+    id_funcion: 603,
+    id_staff: 11,
+    tipo_incidente: "Incidente de seguridad",
+    detalles_especificos: { zona: "Pasillo central", descripcion: "Espectador intentando grabar fragmentos de la proyección con dispositivo móvil." },
+    fecha_reporte: new Date("2026-10-15T22:20:00Z")
+  },
+  {
+    id_sala: 3,
+    id_funcion: 604,
+    id_staff: 21,
+    tipo_incidente: "Falla técnica",
+    detalles_especificos: { equipo: "Proyector", descripcion: "Breve retraso en la sincronización de subtítulos al inicio de la función." },
+    fecha_reporte: new Date("2026-10-18T17:50:00Z")
+  },
+  {
+    id_sala: 4,
+    id_funcion: 605,
+    id_staff: 16,
+    tipo_incidente: "Queja de servicio",
+    detalles_especificos: { area: "Confitería", descripcion: "Falta de stock temporal de vasos coleccionables temáticos de la película." },
+    fecha_reporte: new Date("2026-10-20T21:10:00Z")
+  }
+]);
