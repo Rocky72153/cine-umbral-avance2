@@ -1,0 +1,104 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Cine Bogotá — El cine nos reúne</title>
+  <meta name="description" content="Consulta películas, funciones y operaciones de Cine Bogotá.">
+  <link rel="stylesheet" href="{{ url_for('static', filename='estilos.css') }}">
+  <script defer src="{{ url_for('static', filename='app.js') }}"></script>
+</head>
+<body>
+  <header class="topbar">
+    <a class="brand" href="/" aria-label="Cine Bogotá, inicio"><span class="brand-mark">C<span>·</span></span><span>CINE<br><b>BOGOTÁ</b></span></a>
+    <nav class="nav" aria-label="Navegación principal">
+      <button class="nav-button active" type="button" data-target="peliculas" aria-current="page">Películas</button>
+      <button class="nav-button" type="button" data-target="funciones">Funciones</button>
+      <button class="nav-button" type="button" data-target="boleteria">Boletería</button>
+      <button class="nav-button" type="button" data-target="gestion">Gestión</button>
+    </nav>
+    <span class="top-label">UNA HISTORIA EN CADA SALA <span>✳</span></span>
+  </header>
+  <main>
+    <section id="peliculas" class="view">
+      <div class="hero">
+        <div class="hero-copy"><span class="eyebrow light"><span class="live-dot"></span> BIENVENIDOS A CINE BOGOTÁ</span>
+          <h1>El cine nos<br><em>reúne.</em></h1>
+          <p>Explora nuestras películas, descubre sus versiones y encuentra la función que quieres ver.</p>
+          <button class="button button-light" type="button" id="explorar">Explorar películas <span>↗</span></button>
+        </div>
+        <div class="hero-art" aria-hidden="true"><div class="orbit orbit-one"></div><div class="orbit orbit-two"></div><div class="film-frame"><span class="frame-number">01 / 04</span><div class="aperture"><span>✳</span></div><span class="frame-caption">UNA HISTORIA<br>POR DESCUBRIR</span></div><span class="art-side">LA MAGIA ESTÁ EN LA SALA</span></div>
+        <div class="hero-bottom"><span>BOGOTÁ, COLOMBIA</span><span>CADA HISTORIA CUENTA &nbsp; ↘</span></div>
+      </div>
+      <section class="section" id="catalogo">
+        <div class="section-heading"><div><span class="eyebrow">01 / EXPLORAR</span><h2>Películas<span class="red">.</span></h2><p>Conoce las historias registradas en nuestro catálogo.</p></div><span class="count" id="peliculas-count">Cargando catálogo</span></div>
+        <div class="search-wrap"><span aria-hidden="true">⌕</span><label class="sr-only" for="buscar">Buscar películas</label><input id="buscar" type="search" placeholder="Buscar una película por su título..."><kbd>⌘</kbd></div>
+        <p id="peliculas-estado" class="feedback" role="status"></p>
+        <div id="peliculas-lista" class="movie-grid"></div>
+      </section>
+    </section>
+    <section id="funciones" class="view section" hidden>
+      <div class="page-heading"><span class="eyebrow">02 / PROGRAMACIÓN</span><h1>Funciones<span class="red">.</span></h1><p>Consulta las funciones registradas y sus requisitos de proyección.</p></div>
+      <p id="funciones-estado" class="feedback" role="status"></p><div id="funciones-lista" class="schedule-list"></div>
+    </section>
+    <section id="boleteria" class="view section" hidden>
+      <div class="page-heading"><span class="eyebrow">03 / TAQUILLA</span><h1>Registrar venta<span class="red">.</span></h1><p>Selecciona la función y registra las boletas para el espectador.</p></div>
+      <form id="venta-form" class="panel form-layout">
+        <div class="form-intro"><span class="number-badge">01</span><div><h2>Datos de la venta</h2><p>La venta se registra mediante el procedimiento del proyecto.</p></div></div>
+        <div class="form-grid">
+          <label>Función<select name="id_funcion" data-source="funciones" required><option value="">Selecciona una función</option></select></label>
+          <label>Espectador<select name="id_espectador" data-source="espectadores" required><option value="">Selecciona un espectador</option></select></label>
+          <label>Responsable de taquilla<select name="id_staff" data-source="staff" required><option value="">Selecciona un integrante</option></select></label>
+          <label>Método de pago<select name="id_metodo_pago" data-source="pagos" required><option value="">Selecciona un método</option></select></label>
+        </div>
+        <div class="form-intro subhead"><span class="number-badge">02</span><div><h2>Boletas</h2><p>Agrega el asiento, tipo y precio de cada boleta.</p></div></div>
+        <div id="boletas-lista"></div><button id="agregar-boleta" type="button" class="button button-outline">+ Agregar boleta</button>
+        <div class="form-actions"><p class="feedback" id="venta-estado" role="status"></p><button class="button button-primary" type="submit">Registrar venta <span>↗</span></button></div>
+      </form>
+    </section>
+    <section id="gestion" class="view section" hidden>
+      <div class="page-heading"><span class="eyebrow">04 / OPERACIÓN</span><h1>Gestión<span class="red">.</span></h1><p>Consulta reportes y registra novedades de las funciones.</p></div>
+      <div class="management-grid">
+        <article class="panel"><span class="eyebrow">RECAUDO</span><h2>Reporte de ventas</h2><p>Consulta los resultados por función en un rango de fechas.</p>
+          <form id="reporte-form" class="stack"><label>Desde<input type="date" name="desde" required></label><label>Hasta<input type="date" name="hasta" required></label><button class="button button-primary" type="submit">Consultar reporte ↗</button></form>
+          <p id="reporte-estado" class="feedback" role="status"></p><div class="table-wrap"><table id="reporte-tabla" hidden><thead><tr><th>Función</th><th>Película</th><th>Fecha</th><th>Hora</th><th>Sala</th><th>Capacidad</th><th>Ventas</th><th>Boletas</th><th>Recaudo</th></tr></thead><tbody></tbody></table></div>
+        </article>
+        <article class="panel"><span class="eyebrow">SALAS</span><h2>Estado de sala</h2><p>Actualiza el estado operativo de una sala.</p>
+          <form id="sala-form" class="stack"><label>Sala<select name="id_sala" data-source="salas" required><option value="">Selecciona una sala</option></select></label><label>Nuevo estado<select name="id_estado_sala" data-source="estados_sala" required><option value="">Selecciona un estado</option></select></label><button class="button button-primary" type="submit">Actualizar estado ↗</button></form>
+          <p id="sala-estado" class="feedback" role="status"></p>
+        </article>
+        <article class="panel"><span class="eyebrow">NOVEDADES</span><h2>Registrar incidente</h2><p>Deja constancia de una novedad relacionada con una función.</p>
+          <form id="incidente-form" class="stack"><label>Función<select name="id_funcion" data-source="funciones" required><option value="">Selecciona una función</option></select></label><label>Responsable<select name="id_staff" data-source="staff" required><option value="">Selecciona un integrante</option></select></label><div class="form-grid"><label>Tipo<select name="tipo" required><option value="tecnico">Técnico</option><option value="servicio">Servicio</option><option value="seguridad">Seguridad</option></select></label><label>Severidad<select name="severidad" required><option value="baja">Baja</option><option value="media">Media</option><option value="alta">Alta</option><option value="critica">Crítica</option></select></label></div><label>Descripción<textarea name="descripcion" maxlength="1000" required rows="3" placeholder="Describe la novedad"></textarea></label><button class="button button-primary" type="submit">Registrar incidente ↗</button></form>
+          <p id="incidente-estado" class="feedback" role="status"></p>
+        </article>
+        <article class="panel"><div class="panel-top"><div><span class="eyebrow">SEGUIMIENTO</span><h2>Incidentes recientes</h2></div><button id="recargar-incidentes" type="button" class="text-button">Actualizar ↻</button></div><p id="incidentes-estado" class="feedback" role="status"></p><div id="incidentes-lista" class="incident-list"></div></article>
+      </div>
+      <section class="rules-section">
+        <div class="section-heading"><div><span class="eyebrow">ADMINISTRACIÓN</span><h2>Datos del cine<span class="red">.</span></h2><p>Registra y actualiza información; PostgreSQL aplica sus reglas al guardar.</p></div></div>
+        <div class="management-grid rules-grid">
+          <details class="panel"><summary>Nueva función <span>+</span></summary><p>Registra una función con fecha, sala y horarios.</p>
+            <form id="funcion-form" class="stack"><label>Película<select name="id_pelicula" data-source="peliculas" required><option value="">Selecciona una película</option></select></label><label>Sala<select name="id_sala" data-source="salas" required><option value="">Selecciona una sala</option></select></label><label>Fecha<input type="date" name="fecha" required></label><div class="form-grid"><label>Hora de inicio<input type="time" name="hora_inicio" required></label><label>Hora de finalización<input type="time" name="hora_fin" required></label></div><button class="button button-primary">Registrar función ↗</button><p id="funcion-form-estado" class="feedback" role="status"></p></form>
+          </details>
+          <details class="panel"><summary>Capacidad de sala <span>+</span></summary><p>Actualiza la capacidad de una sala.</p>
+            <form id="capacidad-form" class="stack"><label>Sala<select name="id_sala" data-source="salas" required><option value="">Selecciona una sala</option></select></label><label>Capacidad<input type="number" name="capacidad" min="1" required></label><button class="button button-primary">Actualizar capacidad ↗</button><p id="capacidad-form-estado" class="feedback" role="status"></p></form>
+          </details>
+          <details class="panel"><summary>Nuevo integrante <span>+</span></summary><p>Se registra inactivo hasta que tenga un contrato.</p>
+            <form id="staff-form" class="stack"><div class="form-grid"><label>Nombre<input name="primer_nombre" maxlength="50" required></label><label>Apellido<input name="primer_apellido" maxlength="50" required></label></div><label>Cargo<select name="id_cargo_staff" data-source="cargos" required><option value="">Selecciona un cargo</option></select></label><label>Tipo de documento<select name="id_tipo_documento" data-source="tipos_documento" required><option value="">Selecciona un tipo</option></select></label><label>Número de documento<input name="numero_documento" maxlength="20" required></label><button class="button button-primary">Registrar integrante ↗</button><p id="staff-form-estado" class="feedback" role="status"></p></form>
+          </details>
+          <details class="panel"><summary>Nuevo contrato <span>+</span></summary><p>Registra el contrato laboral de un integrante.</p>
+            <form id="contrato-form" class="stack"><label>Integrante<select name="id_staff" data-source="staff" required><option value="">Selecciona un integrante</option></select></label><label>Tipo de contrato<select name="id_tipo_contrato" data-source="tipos_contrato" required><option value="">Selecciona un tipo</option></select></label><label>Fecha de inicio<input type="date" name="fecha_inicio" required></label><label>Salario (COP)<input type="number" name="salario" step="0.01" required></label><button class="button button-primary">Registrar contrato ↗</button><p id="contrato-form-estado" class="feedback" role="status"></p></form>
+          </details>
+          <details class="panel"><summary>Estado del personal <span>+</span></summary><p>Actualiza el estado laboral de un integrante.</p>
+            <form id="staff-estado-form" class="stack"><label>Integrante<select name="id_staff" data-source="staff" required><option value="">Selecciona un integrante</option></select></label><label>Estado<select name="id_estado_staff" data-source="estados_staff" required><option value="">Selecciona un estado</option></select></label><button class="button button-primary">Actualizar estado ↗</button><p id="staff-estado-form-estado" class="feedback" role="status"></p></form>
+          </details>
+          <details class="panel"><summary>Correo de espectador <span>+</span></summary><p>Actualiza el correo de un espectador registrado.</p>
+            <form id="correo-form" class="stack"><label>Espectador<select name="id_espectador" data-source="espectadores" required><option value="">Selecciona un espectador</option></select></label><label>Correo<input type="text" name="correo" maxlength="100" required placeholder="nombre@ejemplo.com"></label><button class="button button-primary">Actualizar correo ↗</button><p id="correo-form-estado" class="feedback" role="status"></p></form>
+          </details>
+        </div>
+      </section>
+    </section>
+  </main>
+  <footer><span>CINE BOGOTÁ <b>✳</b></span><span>LAS HISTORIAS SE VIVEN MEJOR JUNTOS.</span><span>BOGOTÁ, COLOMBIA</span></footer>
+  <dialog id="detalle-dialog"><div class="dialog-top"><span class="eyebrow">CINE BOGOTÁ / DETALLE</span><button type="button" id="cerrar-dialog" class="close-button" aria-label="Cerrar">×</button></div><div id="detalle-contenido"></div></dialog>
+</body>
+</html>

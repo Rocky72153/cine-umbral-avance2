@@ -1,0 +1,37 @@
+name: cine-bogota
+services:
+  postgres:
+    image: postgres:17-alpine
+    environment:
+      POSTGRES_DB: cine_bogota
+      POSTGRES_USER: cine
+      POSTGRES_PASSWORD: ${CINE_POSTGRES_PASSWORD:-cine_demo_local}
+    ports:
+      - "127.0.0.1:${CINE_POSTGRES_PORT:-55432}:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ../avance1-postgresql/scripts/01_creacion_tablas.sql:/docker-entrypoint-initdb.d/01_creacion_tablas.sql:ro
+      - ../avance1-postgresql/scripts/02_datos_prueba.sql:/docker-entrypoint-initdb.d/02_datos_prueba.sql:ro
+      - ../avance1-postgresql/scripts/03_triggers.sql:/docker-entrypoint-initdb.d/03_triggers.sql:ro
+      - ../avance1-postgresql/scripts/04_procedimientos.sql:/docker-entrypoint-initdb.d/04_procedimientos.sql:ro
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U cine -d cine_bogota"]
+      interval: 5s
+      timeout: 3s
+      retries: 12
+  mongodb:
+    image: mongo:8.0
+    ports:
+      - "127.0.0.1:${CINE_MONGO_PORT:-57017}:27017"
+    volumes:
+      - mongo_data:/data/db
+      - ../avance2-mongodb/scripts/01_creacion_colecciones.js:/docker-entrypoint-initdb.d/01_creacion_colecciones.js:ro
+      - ../avance2-mongodb/scripts/02_datos_prueba.js:/docker-entrypoint-initdb.d/02_datos_prueba.js:ro
+    healthcheck:
+      test: ["CMD", "mongosh", "--quiet", "--eval", "db.adminCommand({ping:1}).ok"]
+      interval: 5s
+      timeout: 5s
+      retries: 12
+volumes:
+  postgres_data:
+  mongo_data:
