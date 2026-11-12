@@ -1,9 +1,9 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="3900" height="3570" viewBox="0 0 3900 3570" role="img" aria-labelledby="titulo descripcion">
+<svg xmlns="http://www.w3.org/2000/svg" width="3900" height="3335" viewBox="0 0 3900 3335" role="img" aria-labelledby="titulo descripcion">
 <title id="titulo">Cine Bogotá: arquitectura políglota con relaciones directas</title>
 <desc id="descripcion">Diecinueve tablas PostgreSQL y cuatro colecciones MongoDB con líneas directas entre claves foráneas e identificadores compartidos.</desc>
 <defs><marker id="arrow-solid" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0 0 L10 5 L0 10 Z" fill="#242424"/></marker><marker id="arrow-dashed" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0 0 L10 5 L0 10 Z" fill="#242424"/></marker></defs>
 <style>text{font-family:"Segoe UI",Arial,sans-serif;fill:#171717}.eyebrow{font-size:23px;letter-spacing:3px;fill:#555}.title{font-size:54px;font-weight:700}.subtitle{font-size:25px;fill:#555}.panelTitle{font-size:34px;font-weight:700}.panelSub{font-size:22px;fill:#555}.cardTitle{font-size:25px;font-weight:700}.field{font-family:Consolas,"Courier New",monospace;font-size:21px}.legend{font-size:22px;fill:#333}</style>
-<rect width="3900" height="3570" fill="#fff"/>
+<rect width="3900" height="3335" fill="#fff"/>
 <text x="55" y="60" class="eyebrow">CINE BOGOTÁ / PROYECTO INTEGRADOR</text>
 <text x="55" y="128" class="title">Arquitectura políglota de datos</text>
 <text x="55" y="169" class="subtitle">Relaciones entre tablas, colecciones y campos compartidos</text>
@@ -237,11 +237,4 @@
 <text x="2995" y="2740" class="field">tipo_incidente · fecha_reporte</text>
 <text x="2995" y="2772" class="field">[E] detalles_especificos {campos según tipo}</text>
 </g>
-<line x1="55" y1="3350" x2="3840" y2="3350" stroke="#222" stroke-width="2"/>
-<text x="55" y="3390" class="legend">PK: clave primaria    FK: clave foránea de PostgreSQL    [R]: identificador compartido    [E]: dato embebido</text>
-<line x1="55" y1="3430" x2="180" y2="3430" stroke="#222" stroke-width="2" marker-end="url(#arrow-solid)"/>
-<text x="195" y="3437" class="legend">FK → PK dentro de PostgreSQL</text>
-<line x1="720" y1="3430" x2="845" y2="3430" stroke="#222" stroke-width="3" stroke-dasharray="15 10" marker-end="url(#arrow-dashed)"/>
-<text x="860" y="3437" class="legend">ID compartido entre motores; referencia lógica, no clave foránea</text>
-<text x="55" y="3485" class="legend">Las relaciones y campos se basan en los scripts vigentes del repositorio.</text>
 </svg>
