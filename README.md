@@ -108,6 +108,3 @@ Los IDs documentados se cotejaron con `avance1-postgresql/scripts/01_creacion_ta
 
 La integración final debe validar que estos IDs existan en PostgreSQL desde la aplicación que escriba los documentos. El `id_venta` de un incidente es opcional.
 
-## Participación del equipo
-
-El grupo tiene cuatro integrantes. La asignación de revisión y commits se encuentra en [REPARTO_AVANCE2.md](./REPARTO_AVANCE2.md); cada integrante debe revisar o completar su frente desde su propia cuenta de GitHub. El informe PDF se trabajará aparte.
