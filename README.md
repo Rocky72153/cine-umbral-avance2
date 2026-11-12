@@ -46,7 +46,7 @@ La contraseña indicada corresponde únicamente a los datos locales de demostrac
 
 Para ejecutar las comprobaciones de rutas y validaciones con conexiones simuladas: `.\.venv\Scripts\python.exe -m unittest discover -s integracion/tests -v`.
 
-![Diagrama de arquitectura políglota](./avance2-mongodb/diagrama-arquitectura-poliglota/diagrama-arquitectura-poliglota.svg)
+![Diagrama de arquitectura políglota](./avance2-mongodb/diagrama-arquitectura-poliglota/diagrama-arquitectura-poliglota.svg?v=6733e95)
 
 [Abrir el diagrama en PNG](./avance2-mongodb/diagrama-arquitectura-poliglota/diagrama-arquitectura-poliglota.png) · [Abrir el SVG editable](./avance2-mongodb/diagrama-arquitectura-poliglota/diagrama-arquitectura-poliglota.svg)
 
