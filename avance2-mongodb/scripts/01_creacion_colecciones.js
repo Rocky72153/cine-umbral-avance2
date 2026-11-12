@@ -177,3 +177,43 @@ db.reportes_incidentes.insertMany([
     fecha_reporte: new Date("2026-10-20T21:10:00Z")
   }
 ]);
+
+//$jsonSchema (Validación de esquema)
+
+//Validador de reseñas de películas
+db.runCommand({
+  collMod: "resenas_peliculas",
+  validator: {
+    $jsonSchema: {
+      bsonType: "object",
+      required: ["id_pelicula", "id_espectador", "calificacion", "fecha"],
+      properties: {
+        id_pelicula:       { bsonType: "number" },
+        id_espectador:     { bsonType: "number" },
+        calificacion:      { bsonType: "number", minimum: 1, maximum: 5 },
+        texto_libre:       { bsonType: "string" },
+        fecha:             { bsonType: "date" },
+        respuesta_empresa: { bsonType: "string" }
+      }
+    }
+  }
+});
+
+//Validador de reportes de incidentes
+db.runCommand({
+  collMod: "reportes_incidentes",
+  validator: {
+    $jsonSchema: {
+      bsonType: "object",
+      required: ["id_sala", "id_funcion", "tipo_incidente", "fecha_reporte"],
+      properties: {
+        id_sala:        { bsonType: "number" },
+        id_funcion:     { bsonType: "number" },
+        id_staff:       { bsonType: "number" },
+        tipo_incidente: { enum: ["Falla técnica", "Queja de servicio", "Incidente de seguridad"] },
+        fecha_reporte:  { bsonType: "date" },
+        detalles_especificos: { bsonType: "object" }
+      }
+    }
+  }
+});
