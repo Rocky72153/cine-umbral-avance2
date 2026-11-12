@@ -12,7 +12,7 @@ if not exist ".venv\Scripts\python.exe" (
 if errorlevel 1 goto error
 set "POSTGRES_URL=postgresql://cine:cine_demo_local@127.0.0.1:55432/cine_bogota"
 set "MONGODB_URI=mongodb://127.0.0.1:57017"
-set "MONGODB_DATABASE=cine_bogota_avance2"
+if not defined MONGODB_DATABASE set "MONGODB_DATABASE=cine_bogota_avance2"
 echo.
 echo Abre http://127.0.0.1:5000/ en tu navegador.
 echo Mantenga esta ventana abierta mientras usa la aplicacion.

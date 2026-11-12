@@ -30,8 +30,8 @@ class AplicacionTest(unittest.TestCase):
             con = conectar.return_value.__enter__.return_value
             con.execute.return_value.fetchone.return_value = {"id_pelicula": 1, "titulo": "Película"}
             db = mongo.return_value.__enter__.return_value.__getitem__.return_value
-            db.fichas_tecnicas_peliculas.find.return_value.sort.return_value = [{"id_pelicula": 1, "version": {"codigo": "2D"}}]
-            db.resenas_peliculas.find.return_value.sort.return_value.limit.return_value = [{"id_pelicula": 1, "texto": "Bien"}]
+            db.fichas_tecnicas_peliculas.find.return_value = [{"id_pelicula": 1, "duracion_por_version": {"cine": "99 min"}}]
+            db.resenas_peliculas.find.return_value.sort.return_value.limit.return_value = [{"id_pelicula": 1, "texto_libre": "Bien"}]
             r = self.client.get("/api/peliculas/1")
             self.assertEqual(r.status_code, 200)
             self.assertEqual(r.json["pelicula"]["id_pelicula"], 1)
@@ -97,7 +97,24 @@ class AplicacionTest(unittest.TestCase):
             coleccion = mongo.return_value.__enter__.return_value.__getitem__.return_value.resenas_peliculas
             guardado = coleccion.insert_one.call_args.args[0]
             self.assertEqual((guardado["id_pelicula"], guardado["id_espectador"]), (1, 3))
-            self.assertIsNone(guardado["respuesta_empresa"])
+            self.assertEqual(guardado["texto_libre"], "Muy buena")
+            self.assertNotIn("respuesta_empresa", guardado)
+
+    def test_incidente_guarda_campos_del_esquema_actual(self):
+        with patch("integracion.app.psycopg.connect") as conectar, patch("integracion.app.MongoClient") as mongo:
+            con = conectar.return_value.__enter__.return_value
+            con.execute.return_value.fetchone.side_effect = [{"id_sala": 2}, {"existe": 1}]
+            respuesta = self.client.post("/api/incidentes", json={
+                "id_funcion": 1, "id_staff": 3, "tipo": "tecnico", "severidad": "alta",
+                "descripcion": "Falla de audio",
+            })
+            self.assertEqual(respuesta.status_code, 201)
+            coleccion = mongo.return_value.__enter__.return_value.__getitem__.return_value.reportes_incidentes
+            guardado = coleccion.insert_one.call_args.args[0]
+            self.assertEqual(guardado["tipo_incidente"], "Falla técnica")
+            self.assertEqual((guardado["id_sala"], guardado["id_staff"]), (2, 3))
+            self.assertEqual(guardado["detalles_especificos"], {"descripcion": "Falla de audio", "severidad": "alta"})
+            self.assertIn("fecha_reporte", guardado)
 
     def test_reporte_rechaza_rango_invertido(self):
         with patch("integracion.app.psycopg.connect") as conectar:

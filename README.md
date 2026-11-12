@@ -40,7 +40,22 @@ $env:MONGODB_DATABASE = 'cine_bogota_avance2'
 .\.venv\Scripts\python.exe -m flask --app integracion.app run
 ```
 
-Abre `http://127.0.0.1:5000/`. La primera ejecución crea bases de demostración y carga los scripts en orden; los volúmenes conservan ventas, reseñas e incidentes entre reinicios. Para detener los servicios, ejecuta `docker compose -f integracion/compose.yml down`; ese comando conserva sus datos. También puedes conectar bases existentes cambiando las variables de conexión y ejecutando sus scripts de creación, datos, triggers y procedimientos.
+Abre `http://127.0.0.1:5000/`. La primera ejecución crea bases de demostración y carga los scripts en orden; los volúmenes conservan ventas, reseñas e incidentes entre reinicios. Para detener los servicios, ejecuta `docker compose -f integracion/compose.yml down`; ese comando conserva sus datos. También puedes conectar bases existentes preparadas mediante las variables de conexión.
+
+MongoDB inicializa los scripts en `cine_bogota_avance2` solamente cuando el volumen es nuevo. Si ya usabas el proyecto y tus documentos quedaron en la base `test`, el cambio de configuración no los mueve ni vuelve a ejecutar los scripts. Para comprobar las colecciones de esa base con los servicios en marcha:
+
+```powershell
+docker compose -f integracion/compose.yml exec mongodb mongosh test --quiet --eval "printjson(db.getCollectionNames())"
+```
+
+Si confirmas que los datos que quieres usar están en `test`, puedes iniciar la aplicación apuntando a esa base, sin copiar ni borrar datos:
+
+```powershell
+$env:MONGODB_DATABASE = 'test'
+.\integracion\iniciar.bat
+```
+
+La selección no combina ni traslada datos entre bases. En una nueva ventana de PowerShell, o al eliminar esa variable de la sesión, se usa nuevamente `cine_bogota_avance2`.
 
 La contraseña indicada corresponde únicamente a los datos locales de demostración. La interfaz no tiene inicio de sesión y está pensada para ejecutarse en el equipo; antes de publicarla o conectarla a datos reales se necesitan autenticación, control de permisos y configuración segura.
 
@@ -78,7 +93,7 @@ mongosh "mongodb://localhost:27017/cine_bogota_avance2" --file .\avance2-mongodb
 mongosh "mongodb://localhost:27017/cine_bogota_avance2" --file .\avance2-mongodb\scripts\03_consultas.js
 ```
 
-Los scripts pueden repetirse. La creación actualiza validadores e índices; la carga hace `replaceOne` con `upsert` usando los `_id` de la semilla. No ejecutan `dropDatabase`, `drop` ni `deleteMany`.
+Los scripts actuales están preparados para una base nueva: el primero crea las colecciones y agrega cinco documentos en cada una, y el segundo agrega 25 más. No los ejecutes de nuevo sobre una base con datos, porque pueden producir errores o insertar duplicados.
 
 ## Correspondencia con PostgreSQL
 

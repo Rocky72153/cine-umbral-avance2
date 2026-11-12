@@ -100,7 +100,7 @@ def create_app():
             db = base(cliente)
             fichas = list(db.fichas_tecnicas_peliculas.find(
                 {"id_pelicula": id_pelicula}, {"_id": 0}
-            ).sort("version.codigo", 1))
+            ))
             resenas = list(db.resenas_peliculas.find(
                 {"id_pelicula": id_pelicula}, {"_id": 0}
             ).sort("fecha", -1).limit(50))
@@ -123,8 +123,8 @@ def create_app():
         if not all(existe.values()):
             raise ValueError("La película o el espectador no existen.")
         documento = {"_id": "RE-" + uuid.uuid4().hex, "id_pelicula": id_pelicula,
-                     "id_espectador": espectador, "calificacion": calificacion, "texto": comentario,
-                     "fecha": datetime.now(timezone.utc), "respuesta_empresa": None}
+                     "id_espectador": espectador, "calificacion": calificacion, "texto_libre": comentario,
+                     "fecha": datetime.now(timezone.utc)}
         with mongo() as cliente:
             base(cliente).resenas_peliculas.insert_one(documento)
         return jsonify(mensaje="Reseña registrada."), 201
@@ -314,7 +314,7 @@ def create_app():
     @app.get("/api/incidentes")
     def incidentes():
         with mongo() as cliente:
-            rows = list(base(cliente).reportes_incidentes.find({}, {"_id": 0}).sort("fecha", -1).limit(30))
+            rows = list(base(cliente).reportes_incidentes.find({}, {"_id": 0}).sort("fecha_reporte", -1).limit(30))
         return jsonify(incidentes=rows)
 
     @app.post("/api/incidentes")
@@ -331,11 +331,10 @@ def create_app():
         if not fila or not responsable:
             raise ValueError("La función o el integrante de staff no existen.")
         ahora = datetime.now(timezone.utc)
-        documento = {"_id": "IN-" + uuid.uuid4().hex, "tipo": tipo, "id_funcion": funcion,
-                     "id_sala": fila["id_sala"], "id_venta": None, "id_espectador": None,
-                     "fecha": ahora, "severidad": severidad, "estado": "abierto",
-                     "descripcion": descripcion, "detalles": {}, "reportado_por": {"tipo": "staff", "id_staff": staff},
-                     "actualizado_en": ahora}
+        tipos = {"tecnico": "Falla técnica", "servicio": "Queja de servicio", "seguridad": "Incidente de seguridad"}
+        documento = {"_id": "IN-" + uuid.uuid4().hex, "tipo_incidente": tipos[tipo], "id_funcion": funcion,
+                     "id_sala": fila["id_sala"], "id_staff": staff, "fecha_reporte": ahora,
+                     "detalles_especificos": {"descripcion": descripcion, "severidad": severidad}}
         with mongo() as cliente:
             base(cliente).reportes_incidentes.insert_one(documento)
         return jsonify(mensaje="Incidente registrado."), 201

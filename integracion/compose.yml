@@ -21,6 +21,8 @@ services:
       retries: 12
   mongodb:
     image: mongo:8.0
+    environment:
+      MONGO_INITDB_DATABASE: ${MONGODB_DATABASE:-cine_bogota_avance2}
     ports:
       - "127.0.0.1:${CINE_MONGO_PORT:-57017}:27017"
     volumes:

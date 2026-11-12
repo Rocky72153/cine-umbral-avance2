@@ -93,19 +93,22 @@ async function showPelicula(id) {
     const versions = detailSection("Versiones y ficha técnica");
     if (!data.fichas_tecnicas.length) versions.append(node("p", "Aún no hay fichas técnicas para esta película.", "detail-line"));
     for (const f of data.fichas_tecnicas) {
-      const line = node("p", null, "detail-line");
-      line.append(node("strong", f.version?.formato || "Versión"),
-        document.createTextNode(" · " + (f.version?.duracion_minutos || "—") + " min · Audio: " + (f.idiomas_audio || []).join(", ") + " · Subtítulos: " + ((f.subtitulos || []).join(", ") || "Sin registrar")));
-      versions.append(line);
+      const durations = Object.entries(f.duracion_por_version || {});
+      for (const [version, duration] of durations) {
+        const line = node("p", null, "detail-line");
+        line.append(node("strong", version.replaceAll("_", " ")),
+          document.createTextNode(" · " + duration + " · Audio: " + ((f.idiomas_y_subtitulos?.audio || []).join(", ") || "Sin registrar") + " · Subtítulos: " + ((f.idiomas_y_subtitulos?.subtitulos || []).join(", ") || "Sin registrar")));
+        versions.append(line);
+      }
     }
     const cast = data.fichas_tecnicas[0]?.elenco || [];
-    if (cast.length) { const section = detailSection("Elenco"); section.append(node("p", cast.map(x => x.nombre + " (" + x.rol_en_pelicula + ")").join(" · "), "detail-line")); }
+    if (cast.length) { const section = detailSection("Elenco"); section.append(node("p", cast.map(x => x.nombre + (x.rol ? " (" + x.rol + ")" : "")).join(" · "), "detail-line")); }
     const reviews = detailSection("Reseñas");
     if (!data.resenas.length) reviews.append(node("p", "Todavía no hay reseñas.", "detail-line"));
     for (const r of data.resenas) {
       const review = node("div", null, "review");
-      review.append(node("span", "★".repeat(Math.min(5, Math.max(0, Number(r.calificacion) || 0))) + "  " + fecha(r.fecha), "stars"), node("p", r.texto));
-      if (r.respuesta_empresa?.mensaje) review.append(node("p", "Respuesta del cine: " + r.respuesta_empresa.mensaje, "detail-line"));
+      review.append(node("span", "★".repeat(Math.min(5, Math.max(0, Number(r.calificacion) || 0))) + "  " + fecha(r.fecha), "stars"), node("p", r.texto_libre || ""));
+      if (r.respuesta_empresa) review.append(node("p", "Respuesta del cine: " + r.respuesta_empresa, "detail-line"));
       reviews.append(review);
     }
     const section = detailSection("Escribir una reseña"), form = node("form", null, "stack");
@@ -147,8 +150,13 @@ async function showRequisitos(f) {
       node("p", fecha(f.fecha) + " · " + f.hora_inicio + " · Sala " + f.id_sala, "detail-line"));
     const section = detailSection("Requisitos de proyección"), r = data.requisitos;
     if (!r) { section.append(node("p", "No hay requisitos registrados para esta función.", "detail-line")); return; }
-    section.append(node("p", [r.proyeccion?.formato, r.proyeccion?.resolucion, r.proyeccion?.audio].filter(Boolean).join(" · "), "detail-line"));
-    for (const item of r.requerimientos || []) section.append(node("p", item.codigo + " · " + item.estado.replaceAll("_", " ") + (item.detalle ? " — " + item.detalle : ""), "detail-line"));
+    if (r.formato) section.append(node("p", "Formato: " + r.formato, "detail-line"));
+    if (r.requerimientos_audio) section.append(node("p", "Audio: " + r.requerimientos_audio, "detail-line"));
+    for (const [key, value] of Object.entries(r.detalles_tecnicos || {})) {
+      const label = key.replaceAll("_", " ");
+      const display = typeof value === "boolean" ? (value ? "Sí" : "No") : value;
+      section.append(node("p", label + ": " + display, "detail-line"));
+    }
   } catch (err) { detail.replaceChildren(node("p", err.message, "feedback error")); }
 }
 async function loadFunciones() {
@@ -220,7 +228,13 @@ async function loadIncidentes() {
     const list = $("#incidentes-lista"), rows = (await api("/api/incidentes")).incidentes; list.replaceChildren();
     if (!rows.length) { feedback("#incidentes-estado", "No hay incidentes registrados."); return; }
     feedback("#incidentes-estado", "");
-    rows.forEach(r => { const el = node("div", null, "incident"); el.append(node("strong", r.tipo + " · " + r.severidad), node("p", r.descripcion), node("small", "Función " + r.id_funcion + " · Sala " + r.id_sala + " · " + fecha(r.fecha))); list.append(el); });
+    rows.forEach(r => {
+      const el = node("div", null, "incident"), details = r.detalles_especificos || {};
+      el.append(node("strong", [r.tipo_incidente, details.severidad].filter(Boolean).join(" · ")),
+        node("p", details.descripcion || "Sin descripción"),
+        node("small", "Función " + r.id_funcion + " · Sala " + r.id_sala + " · " + fecha(r.fecha_reporte)));
+      list.append(el);
+    });
   } catch (err) { feedback("#incidentes-estado", err.message, true); }
 }
 $("#recargar-incidentes").addEventListener("click", loadIncidentes);
