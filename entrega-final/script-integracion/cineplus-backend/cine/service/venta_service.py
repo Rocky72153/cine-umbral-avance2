@@ -3,6 +3,7 @@ from datetime import datetime, timezone
 from django.db import DatabaseError, transaction
 from pymongo.errors import PyMongoError
 
+from cine.repository.funcion_repository import FuncionRepository
 from cine.repository.venta_mongo_repository import VentaMongoRepository
 from cine.repository.venta_repository import VentaRepository
 
@@ -22,6 +23,10 @@ class VentaService:
 
         id_staff = _entero(datos.get("id_staff"))
         id_funcion = _entero(datos.get("id_funcion"))
+        if id_funcion is None and _entero(datos.get("id_pelicula")):
+            for funcion in FuncionRepository.obtener_funciones_por_pelicula(_entero(datos["id_pelicula"])):
+                if funcion["fecha"] == datos.get("fecha") and funcion["hora"] == datos.get("hora"):
+                    id_funcion = funcion["id_funcion"]
         id_espectador = _entero(datos.get("id_espectador"))
         id_metodo_pago = _entero(datos.get("id_metodo_pago"))
 

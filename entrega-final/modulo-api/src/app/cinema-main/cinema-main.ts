@@ -254,6 +254,20 @@ export class CinemaMain implements OnInit {
   ngOnInit(): void {
     this.cargarTiposDocumentoDesdeBackend();
     this.cargarPeliculasDesdeBackend();
+    this.cargarStaffDesdeBackend();
+  }
+
+  private cargarStaffDesdeBackend(): void {
+    this.http.get<ApiResponse<any[]>>(`${this.apiBaseUrl}/staff/`).subscribe({
+      next: resp => {
+        if (resp.status === 'success' && Array.isArray(resp.data)) {
+          this.miembrosStaff = resp.data.map(s => ({ ...s, contrasenia: '' }));
+          this.persistirStaff();
+          this.sincronizarStaffSeleccionadoCompra();
+          this.cdr.detectChanges();
+        }
+      }
+    });
   }
 
   get esAdministrador(): boolean {
@@ -424,44 +438,45 @@ export class CinemaMain implements OnInit {
       return;
     }
 
-    const staffEncontrado = this.miembrosStaff.find(
-      m =>
-        ((m.correo || '').trim().toLowerCase() === identificador ||
-          m.usuario.trim().toLowerCase() === identificador) &&
-        m.contrasenia === clave
-    );
+    this.http
+      .post<ApiResponse<any>>(`${this.apiBaseUrl}/staff/login/`, {
+        usuario: identificador,
+        contrasenia: clave
+      })
+      .subscribe({
+        next: resp => {
+          const s = resp.data;
+          const datosStaff =
+            this.miembrosStaff.find(m => m.id_staff === s.id_staff) ?? this.staffIniciales[0];
+          this.sesionActiva = {
+            tipo: 'staff',
+            id_usuario: s.id_staff,
+            usuario: s.usuario,
+            nombre_completo: `${s.primer_nombre} ${s.primer_apellido}`,
+            id_cargo_staff: s.id_cargo_staff,
+            cargo_nombre: s.cargo_nombre,
+            datos_staff: datosStaff
+          };
+          this.pestanaActiva = s.id_cargo_staff === 3 ? 'staff' : 'cartelera';
+          this.sincronizarStaffSeleccionadoCompra();
+          this.persistirSesion();
+          this.cerrarModal();
+          if (s.id_cargo_staff !== 3) {
+            this.continuarCompraPendienteSiExiste();
+          } else {
+            this.horaPendienteCompra = null;
+          }
+          this.cdr.detectChanges();
+        },
+        // Si no es staff, se intenta como espectador (lógica que ya existía)
+        error: () => {
+          this.iniciarSesionEspectador(identificador, clave);
+          this.cdr.detectChanges();
+        }
+      });
+  }
 
-    if (staffEncontrado) {
-      const nombreCompleto = [
-        staffEncontrado.primer_nombre,
-        staffEncontrado.segundo_nombre,
-        staffEncontrado.primer_apellido,
-        staffEncontrado.segundo_apellido
-      ]
-        .filter(Boolean)
-        .join(' ');
-
-      this.sesionActiva = {
-        tipo: 'staff',
-        id_usuario: staffEncontrado.id_staff,
-        usuario: staffEncontrado.usuario,
-        nombre_completo: nombreCompleto,
-        id_cargo_staff: staffEncontrado.id_cargo_staff,
-        cargo_nombre: staffEncontrado.cargo_nombre,
-        datos_staff: staffEncontrado
-      };
-      this.pestanaActiva = staffEncontrado.id_cargo_staff === 3 ? 'staff' : 'cartelera';
-      this.sincronizarStaffSeleccionadoCompra();
-      this.persistirSesion();
-      this.cerrarModal();
-      if (staffEncontrado.id_cargo_staff !== 3) {
-        this.continuarCompraPendienteSiExiste();
-      } else {
-        this.horaPendienteCompra = null;
-      }
-      return;
-    }
-
+  private iniciarSesionEspectador(identificador: string, clave: string): void {
     const espectadorEncontrado = this.espectadoresGuardados.find(
       esp =>
         ((esp.correo || '').trim().toLowerCase() === identificador ||
@@ -719,30 +734,9 @@ export class CinemaMain implements OnInit {
       return;
     }
 
-    const duplicado = this.miembrosStaff.some(
-      m =>
-        m.numero_documento === numeroDocumento ||
-        m.correo.toLowerCase() === correo.toLowerCase() ||
-        m.usuario.toLowerCase() === usuario.toLowerCase()
-    );
-
-    if (duplicado) {
-      this.errorContratacion = 'Ya existe un miembro de staff con ese documento, correo o usuario.';
-      return;
-    }
-
-    const cargoObj = this.cargosStaff.find(c => c.id === idCargo);
-    const estadoObj = this.estadosStaff.find(e => e.id === idEstado);
-    const contratoObj = this.tiposContrato.find(tc => tc.id === idTipoContrato);
-    const siguienteId =
-      this.miembrosStaff.reduce((max, item) => (item.id_staff > max ? item.id_staff : max), 0) + 1;
-
-    const creado: MiembroStaff = {
-      id_staff: siguienteId,
+    const payload = {
       id_cargo_staff: idCargo,
-      cargo_nombre: cargoObj?.nombre ?? 'Taquillero',
       id_estado_staff: idEstado,
-      estado_nombre: estadoObj?.nombre ?? 'Activo',
       id_tipo_documento: idTipoDoc,
       primer_nombre: primerNombre,
       segundo_nombre: segundoNombre,
@@ -753,34 +747,34 @@ export class CinemaMain implements OnInit {
       usuario,
       contrasenia,
       id_tipo_contrato: idTipoContrato,
-      tipo_contrato_nombre: contratoObj?.nombre ?? 'Indefinido',
       fecha_inicio: fechaInicio,
       salario
     };
 
-    this.miembrosStaff = [...this.miembrosStaff, creado];
-    this.persistirStaff();
-    this.sincronizarStaffSeleccionadoCompra();
-
-    this.nuevoStaff = {
-      id_cargo_staff: 1,
-      id_estado_staff: 1,
-      id_tipo_documento: this.tiposDocumento[0]?.id ?? 1,
-      primer_nombre: '',
-      segundo_nombre: '',
-      primer_apellido: '',
-      segundo_apellido: '',
-      numero_documento: '',
-      correo: '',
-      usuario: '',
-      contrasenia: '',
-      id_tipo_contrato: 1,
-      fecha_inicio: '2026-11-21',
-      salario: 1800000
-    };
-
-    this.mensajeContratacion = `Se contrató a ${creado.primer_nombre} ${creado.primer_apellido} como ${creado.cargo_nombre}.`;
-    this.modalContratarStaffAbierto = false;
+    this.http.post<ApiResponse<any>>(`${this.apiBaseUrl}/staff/contratar/`, payload).subscribe({
+      next: () => {
+        const cargoObj = this.cargosStaff.find(c => c.id === idCargo);
+        this.mensajeContratacion = `Se contrató a ${primerNombre} ${primerApellido} como ${cargoObj?.nombre ?? 'staff'}.`;
+        this.modalContratarStaffAbierto = false;
+        this.nuevoStaff = {
+          ...this.nuevoStaff,
+          primer_nombre: '',
+          segundo_nombre: '',
+          primer_apellido: '',
+          segundo_apellido: '',
+          numero_documento: '',
+          correo: '',
+          usuario: '',
+          contrasenia: ''
+        };
+        this.cargarStaffDesdeBackend();
+        this.cdr.detectChanges();
+      },
+      error: (err: HttpErrorResponse) => {
+        this.errorContratacion = err.error?.message || 'No se pudo contratar al miembro de staff.';
+        this.cdr.detectChanges();
+      }
+    });
   }
 
   private resolverStaffParaVenta(): MiembroStaff {

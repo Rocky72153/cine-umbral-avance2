@@ -30,13 +30,20 @@ class StaffRepository:
 
     @staticmethod
     def listar():
+       
         sql = """
-            SELECT s.id_staff, s.primer_nombre, s.primer_apellido, s.usuario,
-                   s.id_cargo_staff, c.nombre AS cargo, e.nombre AS estado
+            SELECT DISTINCT ON (s.id_staff)
+                s.id_staff, s.id_cargo_staff, c.nombre, s.id_estado_staff, e.nombre,
+                s.id_tipo_documento, s.primer_nombre, s.segundo_nombre,
+                s.primer_apellido, s.segundo_apellido, s.numero_documento,
+                s.correo, s.usuario, ct.id_tipo_contrato, tc.nombre,
+                ct.fecha_inicio, ct.salario
             FROM Staff s
             INNER JOIN Cargo_Staff c ON s.id_cargo_staff = c.id_cargo_staff
             INNER JOIN Estado_Staff e ON s.id_estado_staff = e.id_estado_staff
-            ORDER BY s.id_staff
+            LEFT JOIN Contrato ct ON ct.id_staff = s.id_staff
+            LEFT JOIN Tipo_Contrato tc ON ct.id_tipo_contrato = tc.id_tipo_contrato
+            ORDER BY s.id_staff, ct.fecha_inicio DESC
         """
         with connection.cursor() as cursor:
             cursor.execute(sql)
@@ -45,12 +52,22 @@ class StaffRepository:
         return [
             {
                 "id_staff": f[0],
-                "primer_nombre": f[1],
-                "primer_apellido": f[2],
-                "usuario": f[3],
-                "id_cargo_staff": f[4],
-                "cargo_nombre": f[5],
-                "estado_nombre": f[6],
+                "id_cargo_staff": f[1],
+                "cargo_nombre": f[2],
+                "id_estado_staff": f[3],
+                "estado_nombre": f[4],
+                "id_tipo_documento": f[5],
+                "primer_nombre": f[6],
+                "segundo_nombre": f[7],
+                "primer_apellido": f[8],
+                "segundo_apellido": f[9],
+                "numero_documento": f[10],
+                "correo": f[11],
+                "usuario": f[12],
+                "id_tipo_contrato": f[13],
+                "tipo_contrato_nombre": f[14],
+                "fecha_inicio": f[15].isoformat() if f[15] else "",
+                "salario": float(f[16]) if f[16] is not None else 0,
             }
             for f in filas
         ]

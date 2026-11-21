@@ -1,4 +1,5 @@
-import { Component, OnInit } from '@angular/core';
+import { HttpClient, HttpErrorResponse } from '@angular/common/http';
+import { ChangeDetectorRef, Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 
 export interface DatosCompraFuncion {
@@ -15,6 +16,8 @@ export interface DatosCompraFuncion {
   requisitosSala: string;
   precioBoleta: number;
   cargoServicio: number;
+  idStaffAsignado?: number;
+  espectador?: { id_espectador: number } | null;
 }
 
 interface AsientoSala {
@@ -44,8 +47,30 @@ export class CinemaPruchase implements OnInit {
   metodoPago = 'Tarjeta de crédito';
   correoComprador = '';
   mensajeConfirmacion = '';
+  errorCompra = '';
+  guardandoCompra = false;
 
-  constructor(private router: Router) {
+
+  tiposBoleta = [
+    { id: 1, nombre: 'General', factor: 1 },
+    { id: 2, nombre: 'Niño', factor: 0.8 },
+    { id: 3, nombre: 'Adulto mayor', factor: 0.7 },
+    { id: 4, nombre: 'Preferencial', factor: 1.3 }
+  ];
+  tipoPorAsiento: Record<string, number> = {};
+
+  private readonly apiBaseUrl = 'http://127.0.0.1:8000/api';
+  private readonly idsMetodoPago: Record<string, number> = {
+    'Efectivo en taquilla': 1,
+    'Tarjeta débito': 2,
+    'Tarjeta de crédito': 3
+  };
+
+  constructor(
+    private router: Router,
+    private http: HttpClient,
+    private cdr: ChangeDetectorRef
+  ) {
     const nav = this.router.getCurrentNavigation();
     const datos = nav?.extras?.state?.['funcionCompra'] || history.state?.['funcionCompra'];
     if (datos) {
@@ -171,8 +196,24 @@ export class CinemaPruchase implements OnInit {
     return this.asientosSeleccionados.length;
   }
 
+  obtenerTipoAsiento(asiento: string): number {
+    return this.tipoPorAsiento[asiento] ?? 1;
+  }
+
+  cambiarTipoAsiento(asiento: string, idTipo: string): void {
+    this.tipoPorAsiento = { ...this.tipoPorAsiento, [asiento]: Number(idTipo) };
+  }
+
+  obtenerPrecioAsiento(asiento: string): number {
+    const tipo = this.tiposBoleta.find(t => t.id === this.obtenerTipoAsiento(asiento));
+    return Math.round(this.funcionCompra.precioBoleta * (tipo?.factor ?? 1));
+  }
+
   obtenerSubtotalBoletas(): number {
-    return this.funcionCompra.precioBoleta * this.obtenerCantidadBoletas();
+    return this.asientosSeleccionados.reduce(
+      (total, asiento) => total + this.obtenerPrecioAsiento(asiento),
+      0
+    );
   }
 
   obtenerTotalServicio(): number {
@@ -185,13 +226,43 @@ export class CinemaPruchase implements OnInit {
 
   realizarCompra(event: Event): void {
     event.preventDefault();
-    if (this.asientosSeleccionados.length === 0) {
+    if (this.asientosSeleccionados.length === 0 || this.guardandoCompra) {
       return;
     }
-    const cantidad = this.obtenerCantidadBoletas();
-    const etiquetaBoletas = cantidad === 1 ? '1 boleta' : `${cantidad} boletas`;
-    this.etapaActual = 'confirmada';
-    this.mensajeConfirmacion = `Compra realizada (${etiquetaBoletas}) para "${this.funcionCompra.tituloPelicula}" (${this.funcionCompra.fecha} · ${this.funcionCompra.hora}), asientos ${this.asientosSeleccionados.join(', ')} mediante ${this.metodoPago}.`;
+    this.errorCompra = '';
+    this.guardandoCompra = true;
+
+    const payload = {
+      id_staff: this.funcionCompra.idStaffAsignado,
+      id_espectador: this.funcionCompra.espectador?.id_espectador,
+      id_metodo_pago: this.idsMetodoPago[this.metodoPago] ?? 1,
+      id_pelicula: this.funcionCompra.idPelicula,
+      fecha: this.funcionCompra.fecha,
+      hora: this.funcionCompra.hora,
+      boletas: this.asientosSeleccionados.map(asiento => ({
+        asiento,
+        id_tipo_boleta: this.obtenerTipoAsiento(asiento),
+        precio: this.obtenerPrecioAsiento(asiento) + this.funcionCompra.cargoServicio
+      }))
+    };
+
+    this.http.post<any>(`${this.apiBaseUrl}/ventas/`, payload).subscribe({
+      next: resp => {
+        const venta = resp.data;
+        this.guardandoCompra = false;
+        this.etapaActual = 'confirmada';
+        this.mensajeConfirmacion = `Compra #${venta.id_venta} realizada para "${this.funcionCompra.tituloPelicula}" (${this.funcionCompra.fecha} · ${this.funcionCompra.hora}), asientos ${this.asientosSeleccionados.join(', ')}. Total: $${venta.monto_total}. Atendido por ${venta.staff}.`;
+        this.cdr.detectChanges();
+      },
+      error: (err: HttpErrorResponse) => {
+        this.guardandoCompra = false;
+        const errores = err.error?.errors;
+        this.errorCompra = errores
+          ? Object.values(errores).join(' ')
+          : 'No se pudo conectar con el servidor.';
+        this.cdr.detectChanges();
+      }
+    });
   }
 
   volverACartelera(): void {

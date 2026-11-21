@@ -168,6 +168,26 @@
           @if (etapaActual === 'pago') {
             <form class="formulario-realizar-compra" (submit)="realizarCompra($event)">
               <div class="grupo-campo-compra">
+                <span class="etiqueta-campo-compra">Tipo de boleta</span>
+                @for (asiento of asientosSeleccionados; track asiento) {
+                  <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 8px;">
+                    <strong style="min-width: 40px;">{{ asiento }}</strong>
+                    <select
+                      class="entrada-compra"
+                      style="flex: 1;"
+                      [value]="obtenerTipoAsiento(asiento)"
+                      (change)="cambiarTipoAsiento(asiento, $any($event.target).value)"
+                    >
+                      @for (tipo of tiposBoleta; track tipo.id) {
+                        <option [value]="tipo.id">{{ tipo.nombre }}</option>
+                      }
+                    </select>
+                    <span style="min-width: 70px; text-align: right;">${{ obtenerPrecioAsiento(asiento) }}</span>
+                  </div>
+                }
+              </div>
+
+              <div class="grupo-campo-compra">
                 <label class="etiqueta-campo-compra" for="metodo-pago">Método de pago</label>
                 <select
                   id="metodo-pago"
@@ -194,10 +214,16 @@
                 >
               </div>
 
+              @if (errorCompra) {
+                <p class="texto-error-compra" style="color: #e5484d; margin: 0 0 12px;">{{ errorCompra }}</p>
+              }
+
               <div class="acciones-compra-final">
                 <button type="button" class="boton-secundario-compra" (click)="volverASillas()">Cambiar asiento</button>
                 <button type="button" class="boton-agregar-boleta" (click)="agregarOtraBoleta()">Agregar otra boleta</button>
-                <button type="submit" class="boton-continuar-compra">Realizar compra</button>
+                <button type="submit" class="boton-continuar-compra" [disabled]="guardandoCompra">
+                  {{ guardandoCompra ? 'Procesando...' : 'Realizar compra' }}
+                </button>
               </div>
             </form>
           } @else {

@@ -41,7 +41,13 @@ class StaffService:
             with transaction.atomic():
                 id_staff = StaffRepository.guardar_staff_y_contrato(datos)
         except DatabaseError as error:
-
-            return {"ok": False, "mensaje": str(error).split("\n")[0]}
+            mensaje = str(error).split("\n")[0]
+            if "numero_documento" in mensaje:
+                mensaje = "Ya existe un staff con ese número de documento"
+            elif "correo" in mensaje:
+                mensaje = "Ya existe un staff con ese correo"
+            elif "usuario" in mensaje:
+                mensaje = "Ya existe un staff con ese usuario"
+            return {"ok": False, "mensaje": mensaje}
 
         return {"ok": True, "id_staff": id_staff}

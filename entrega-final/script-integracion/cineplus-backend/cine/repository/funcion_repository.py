@@ -17,7 +17,7 @@ class FuncionRepository:
             FROM Funcion f
             INNER JOIN Sala s ON f.id_sala = s.id_sala
             INNER JOIN Tipo_Sala ts ON s.id_tipo_sala = ts.id_tipo_sala
-            WHERE f.id_pelicula = %s
+            WHERE f.id_pelicula = %s AND f.fecha >= CURRENT_DATE
             ORDER BY f.fecha ASC, f.hora_inicio ASC
         """
         with connection.cursor() as cursor:
