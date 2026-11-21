@@ -1,0 +1,213 @@
+@if (funcionCompra) {
+  <div class="fondo-compra" (click)="volverACartelera()">
+    <div class="ventana-compra" (click)="$event.stopPropagation()">
+      <div class="encabezado-compra">
+        <div>
+          <h2 class="titulo-compra">
+            @if (etapaActual === 'sillas') {
+              Selección de silla y sala
+            } @else {
+              Realizar compra
+            }
+          </h2>
+          <p class="subtitulo-compra">{{ funcionCompra.tituloPelicula }} · {{ funcionCompra.fecha }} · {{ funcionCompra.hora }}</p>
+        </div>
+        <button type="button" class="boton-cerrar-compra" (click)="volverACartelera()" aria-label="Cerrar">×</button>
+      </div>
+
+      <div class="barra-pasos">
+        <span class="paso-indicador" [class.paso-activo]="etapaActual === 'sillas'">1. Sillas y sala</span>
+        <span class="paso-indicador" [class.paso-activo]="etapaActual === 'pago' || etapaActual === 'confirmada'">2. Realizar compra</span>
+      </div>
+
+      @if (etapaActual === 'sillas') {
+        <div class="contenido-sillas">
+          <div class="panel-informacion-funcion">
+            <img [src]="funcionCompra.poster" [alt]="'Póster de ' + funcionCompra.tituloPelicula" class="miniatura-poster">
+
+            <div class="tarjeta-requisitos-sala">
+              <span class="etiqueta-sala">{{ funcionCompra.tipoSala }}</span>
+              <h3 class="titulo-requisitos">Requisitos del tipo de sala</h3>
+              <p class="texto-requisitos">{{ funcionCompra.requisitosSala }}</p>
+            </div>
+
+            <div class="resumen-boleta">
+              <div class="fila-resumen">
+                <span>Cantidad de boletas</span>
+                <strong>{{ obtenerCantidadBoletas() }}</strong>
+              </div>
+              <div class="fila-resumen">
+                <span>Asientos elegidos</span>
+                <strong>{{ asientosSeleccionados.join(', ') || 'Ninguno' }}</strong>
+              </div>
+              @if (asientosSeleccionados.length > 1) {
+                <div class="lista-chips-asientos">
+                  @for (codigo of asientosSeleccionados; track codigo) {
+                    <span class="chip-asiento">
+                      {{ codigo }}
+                      <button type="button" class="quitar-chip-btn" (click)="quitarAsiento(codigo)" aria-label="Quitar asiento">×</button>
+                    </span>
+                  }
+                </div>
+              }
+              <div class="fila-resumen">
+                <span>Valor boletas ({{ obtenerCantidadBoletas() }} × ${{ funcionCompra.precioBoleta }})</span>
+                <strong>${{ obtenerSubtotalBoletas() }}</strong>
+              </div>
+              <div class="fila-resumen">
+                <span>Cargo por servicio ({{ obtenerCantidadBoletas() }} × ${{ funcionCompra.cargoServicio }})</span>
+                <strong>${{ obtenerTotalServicio() }}</strong>
+              </div>
+              <div class="fila-resumen total-resumen">
+                <span>Total</span>
+                <strong>${{ obtenerTotal() }}</strong>
+              </div>
+            </div>
+          </div>
+
+          <div class="panel-mapa-sillas">
+            <div class="leyenda-sillas">
+              <span class="item-leyenda"><i class="muestra muestra-libre"></i> Disponible</span>
+              <span class="item-leyenda"><i class="muestra muestra-seleccionada"></i> Seleccionada</span>
+              <span class="item-leyenda"><i class="muestra muestra-ocupada"></i> Ocupada</span>
+            </div>
+
+            @if (modoAgregarBoleta) {
+              <div class="aviso-modo-adicional">
+                Selecciona en el mapa o en el selector los asientos adicionales para tus boletas.
+              </div>
+            }
+
+            <div class="pantalla-sala">PANTALLA</div>
+
+            <div class="rejilla-sala">
+              @for (fila of filas; track fila) {
+                <div class="fila-asientos">
+                  <span class="letra-fila">{{ fila }}</span>
+                  <div class="grupo-asientos">
+                    @for (asiento of obtenerAsientosFila(fila); track asiento.codigo) {
+                      <button
+                        type="button"
+                        class="asiento-btn"
+                        [class.asiento-libre]="!asiento.ocupado && !estaSeleccionado(asiento.codigo)"
+                        [class.asiento-seleccionado]="estaSeleccionado(asiento.codigo)"
+                        [class.asiento-ocupado]="asiento.ocupado"
+                        [disabled]="asiento.ocupado"
+                        (click)="seleccionarAsiento(asiento.codigo, asiento.ocupado)"
+                      >
+                        {{ asiento.numero }}
+                      </button>
+                    }
+                  </div>
+                </div>
+              }
+            </div>
+
+            <div class="barra-selector-inferior">
+              <div class="selector-asiento-grupo">
+                <label class="etiqueta-selector" for="selector-asiento">Escoger asiento</label>
+                <select
+                  id="selector-asiento"
+                  class="selector-asiento"
+                  [value]="asientoSelector"
+                  (change)="actualizarSelectorAsiento($any($event.target).value)"
+                >
+                  @for (asiento of obtenerTodosLosAsientos(); track asiento.codigo) {
+                    <option [value]="asiento.codigo" [disabled]="asiento.ocupado">
+                      {{ asiento.codigo }}{{ asiento.ocupado ? ' (Ocupado)' : estaSeleccionado(asiento.codigo) ? ' (Seleccionado)' : '' }}
+                    </option>
+                  }
+                </select>
+              </div>
+
+              <button
+                type="button"
+                class="boton-continuar-compra"
+                [disabled]="asientosSeleccionados.length === 0"
+                (click)="continuarConCompra()"
+              >
+                Continuar con la compra
+              </button>
+            </div>
+          </div>
+        </div>
+      } @else {
+        <div class="seccion-realizar-compra">
+          <div class="resumen-compra-final">
+            <h3 class="titulo-bloque-compra">Resumen de tu compra</h3>
+            <div class="fila-resumen">
+              <span>Película</span>
+              <strong>{{ funcionCompra.tituloPelicula }}</strong>
+            </div>
+            <div class="fila-resumen">
+              <span>Función</span>
+              <strong>{{ funcionCompra.fecha }} · {{ funcionCompra.hora }}</strong>
+            </div>
+            <div class="fila-resumen">
+              <span>Tipo de sala</span>
+              <strong>{{ funcionCompra.tipoSala }}</strong>
+            </div>
+            <div class="fila-resumen">
+              <span>Boletas ({{ obtenerCantidadBoletas() }})</span>
+              <strong>{{ asientosSeleccionados.join(', ') }}</strong>
+            </div>
+            <div class="fila-resumen">
+              <span>Subtotal boletas</span>
+              <strong>${{ obtenerSubtotalBoletas() }}</strong>
+            </div>
+            <div class="fila-resumen">
+              <span>Cargo por servicio</span>
+              <strong>${{ obtenerTotalServicio() }}</strong>
+            </div>
+            <div class="fila-resumen total-resumen">
+              <span>Total a pagar</span>
+              <strong>${{ obtenerTotal() }}</strong>
+            </div>
+          </div>
+
+          @if (etapaActual === 'pago') {
+            <form class="formulario-realizar-compra" (submit)="realizarCompra($event)">
+              <div class="grupo-campo-compra">
+                <label class="etiqueta-campo-compra" for="metodo-pago">Método de pago</label>
+                <select
+                  id="metodo-pago"
+                  class="entrada-compra"
+                  [value]="metodoPago"
+                  (change)="metodoPago = $any($event.target).value"
+                >
+                  <option value="Tarjeta de crédito">Tarjeta de crédito</option>
+                  <option value="Tarjeta débito">Tarjeta débito</option>
+                  <option value="Efectivo en taquilla">Efectivo en taquilla</option>
+                </select>
+              </div>
+
+              <div class="grupo-campo-compra">
+                <label class="etiqueta-campo-compra" for="correo-comprador">Correo para envío de boleta</label>
+                <input
+                  id="correo-comprador"
+                  type="email"
+                  class="entrada-compra"
+                  [value]="correoComprador"
+                  (input)="correoComprador = $any($event.target).value"
+                  placeholder="correo@ejemplo.com"
+                  required
+                >
+              </div>
+
+              <div class="acciones-compra-final">
+                <button type="button" class="boton-secundario-compra" (click)="volverASillas()">Cambiar asiento</button>
+                <button type="button" class="boton-agregar-boleta" (click)="agregarOtraBoleta()">Agregar otra boleta</button>
+                <button type="submit" class="boton-continuar-compra">Realizar compra</button>
+              </div>
+            </form>
+          } @else {
+            <div class="confirmacion-compra">
+              <p class="texto-confirmacion">{{ mensajeConfirmacion }}</p>
+              <button type="button" class="boton-continuar-compra" (click)="volverACartelera()">Finalizar</button>
+            </div>
+          }
+        </div>
+      }
+    </div>
+  </div>
+}

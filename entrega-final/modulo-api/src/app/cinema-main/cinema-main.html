@@ -1,0 +1,668 @@
+<header class="barra-superior">
+  <div class="contenedor-barra">
+    <div class="espacio-logo">
+      <img src="/logo-cine.jpeg" alt="Logo Cineplus" class="imagen-logo" width="120" height="44">
+    </div>
+
+    @if (esAdministrador) {
+      <nav class="navegacion-superior">
+        <button
+          type="button"
+          class="boton-pestana"
+          [class.pestana-activa]="pestanaActiva === 'staff'"
+          (click)="seleccionarPestana('staff')"
+        >
+          Gestión de Staff
+        </button>
+        <button
+          type="button"
+          class="boton-pestana"
+          [class.pestana-activa]="pestanaActiva === 'cartelera'"
+          (click)="seleccionarPestana('cartelera')"
+        >
+          Cartelera
+        </button>
+      </nav>
+    }
+
+    @if (sesionActiva) {
+      <div class="sesion-activa-barra">
+        <span class="nombre-usuario-activo">
+          {{ sesionActiva.usuario }}
+          @if (sesionActiva.cargo_nombre) {
+            ({{ sesionActiva.cargo_nombre }})
+          }
+        </span>
+        <button type="button" class="boton-cerrar-sesion" (click)="cerrarSesion()">Cerrar sesión</button>
+      </div>
+    } @else {
+      <button type="button" class="boton-iniciar-sesion" (click)="abrirModal()">
+        <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+          <circle cx="12" cy="7" r="4"></circle>
+        </svg>
+        <span>Iniciar sesión</span>
+      </button>
+    }
+  </div>
+</header>
+
+<main class="contenido-principal">
+  @if (esAdministrador && pestanaActiva === 'staff') {
+    <section class="seccion-gestion-staff">
+      <div class="encabezado-seccion">
+        <div class="indicador-titulo"></div>
+        <h2 class="titulo-seccion">Gestión de Staff</h2>
+        <button type="button" class="boton-contratar-staff" (click)="abrirModalContratarStaff()">
+          Contratar miembro de staff
+        </button>
+      </div>
+
+      @if (mensajeContratacion) {
+        <div class="aviso-exito-seccion">{{ mensajeContratacion }}</div>
+      }
+
+      <div class="lista-staff">
+        @for (miembro of miembrosStaff; track miembro.id_staff) {
+          <article class="tarjeta-miembro-staff">
+            <div class="cabecera-miembro">
+              <div>
+                <h3 class="nombre-miembro">
+                  {{ miembro.primer_nombre }} {{ miembro.segundo_nombre }} {{ miembro.primer_apellido }} {{ miembro.segundo_apellido }}
+                </h3>
+                <span class="usuario-miembro">@{{ miembro.usuario }} · {{ miembro.correo }}</span>
+              </div>
+              <span class="badge-cargo">{{ miembro.cargo_nombre }}</span>
+            </div>
+
+            <div class="datos-miembro">
+              <div class="dato-staff">
+                <span class="etiqueta-dato">Documento</span>
+                <span class="valor-dato">{{ miembro.numero_documento }}</span>
+              </div>
+              <div class="dato-staff">
+                <span class="etiqueta-dato">Estado</span>
+                <span class="valor-dato">{{ miembro.estado_nombre }}</span>
+              </div>
+              <div class="dato-staff">
+                <span class="etiqueta-dato">Contrato</span>
+                <span class="valor-dato">{{ miembro.tipo_contrato_nombre }}</span>
+              </div>
+              <div class="dato-staff">
+                <span class="etiqueta-dato">Inicio y salario</span>
+                <span class="valor-dato">{{ miembro.fecha_inicio }} · ${{ miembro.salario }}</span>
+              </div>
+            </div>
+          </article>
+        }
+      </div>
+    </section>
+  } @else {
+    <section class="seccion-peliculas-destacadas">
+      <div class="encabezado-seccion">
+        <div class="indicador-titulo"></div>
+        <h2 class="titulo-seccion">Películas Destacadas</h2>
+      </div>
+
+      @if (cargandoPeliculas) {
+        <p class="mensaje-estado">Cargando cartelera desde la base de datos...</p>
+      } @else if (peliculas.length === 0) {
+        <p class="mensaje-estado">No hay películas disponibles en este momento.</p>
+      } @else {
+        <div class="contenedor-peliculas">
+          @for (pelicula of peliculas; track pelicula.id) {
+            <article class="tarjeta-pelicula">
+              <div class="contenedor-poster">
+                <img [src]="pelicula.poster" [alt]="'Póster de ' + pelicula.titulo" class="imagen-poster">
+                <div class="capa-detalles-pelicula">
+                  <div class="datos-tecnicos-pelicula">
+                    <span class="clasificacion-pelicula">{{ pelicula.clasificacion }}</span>
+                    <span class="duracion-pelicula">{{ pelicula.duracion }}</span>
+                  </div>
+                  <button type="button" class="boton-comprar" (click)="abrirDetallePelicula(pelicula)">Comprar</button>
+                </div>
+              </div>
+              <div class="informacion-pelicula">
+                <h3 class="nombre-pelicula">{{ pelicula.titulo }}</h3>
+                <p class="titulo-original-pelicula">{{ pelicula.tituloOriginal }}</p>
+              </div>
+            </article>
+          }
+        </div>
+      }
+    </section>
+  }
+</main>
+
+@if (modalContratarStaffAbierto) {
+  <div class="fondo-modal fondo-modal-auth" (click)="cerrarModalContratarStaff()">
+    <div class="ventana-modal ventana-registro" (click)="$event.stopPropagation()">
+      <div class="encabezado-modal">
+        <h2 class="titulo-modal">Contratar miembro de staff</h2>
+        <button type="button" class="boton-cerrar-modal" (click)="cerrarModalContratarStaff()" aria-label="Cerrar">×</button>
+      </div>
+
+      @if (errorContratacion) {
+        <div class="aviso-error-modal">{{ errorContratacion }}</div>
+      }
+
+      <form class="formulario-registro" (submit)="contratarMiembroStaff($event)">
+        <div class="rejilla-registro">
+          <div class="grupo-campo">
+            <label class="etiqueta-campo" for="staff-primer-nombre">Primer nombre *</label>
+            <input
+              id="staff-primer-nombre"
+              type="text"
+              class="entrada-texto"
+              [value]="nuevoStaff.primer_nombre"
+              (input)="nuevoStaff.primer_nombre = $any($event.target).value"
+              required
+            >
+          </div>
+
+          <div class="grupo-campo">
+            <label class="etiqueta-campo" for="staff-segundo-nombre">Segundo nombre</label>
+            <input
+              id="staff-segundo-nombre"
+              type="text"
+              class="entrada-texto"
+              [value]="nuevoStaff.segundo_nombre"
+              (input)="nuevoStaff.segundo_nombre = $any($event.target).value"
+            >
+          </div>
+
+          <div class="grupo-campo">
+            <label class="etiqueta-campo" for="staff-primer-apellido">Primer apellido *</label>
+            <input
+              id="staff-primer-apellido"
+              type="text"
+              class="entrada-texto"
+              [value]="nuevoStaff.primer_apellido"
+              (input)="nuevoStaff.primer_apellido = $any($event.target).value"
+              required
+            >
+          </div>
+
+          <div class="grupo-campo">
+            <label class="etiqueta-campo" for="staff-segundo-apellido">Segundo apellido</label>
+            <input
+              id="staff-segundo-apellido"
+              type="text"
+              class="entrada-texto"
+              [value]="nuevoStaff.segundo_apellido"
+              (input)="nuevoStaff.segundo_apellido = $any($event.target).value"
+            >
+          </div>
+
+          <div class="grupo-campo">
+            <label class="etiqueta-campo" for="staff-cargo">Cargo *</label>
+            <select
+              id="staff-cargo"
+              class="entrada-texto"
+              [value]="nuevoStaff.id_cargo_staff"
+              (change)="nuevoStaff.id_cargo_staff = +$any($event.target).value"
+            >
+              @for (cargo of cargosStaff; track cargo.id) {
+                <option [value]="cargo.id">{{ cargo.nombre }}</option>
+              }
+            </select>
+          </div>
+
+          <div class="grupo-campo">
+            <label class="etiqueta-campo" for="staff-estado">Estado *</label>
+            <select
+              id="staff-estado"
+              class="entrada-texto"
+              [value]="nuevoStaff.id_estado_staff"
+              (change)="nuevoStaff.id_estado_staff = +$any($event.target).value"
+            >
+              @for (estado of estadosStaff; track estado.id) {
+                <option [value]="estado.id">{{ estado.nombre }}</option>
+              }
+            </select>
+          </div>
+
+          <div class="grupo-campo">
+            <label class="etiqueta-campo" for="staff-tipo-doc">Tipo de documento *</label>
+            <select
+              id="staff-tipo-doc"
+              class="entrada-texto"
+              [value]="nuevoStaff.id_tipo_documento"
+              (change)="nuevoStaff.id_tipo_documento = +$any($event.target).value"
+            >
+              @for (doc of tiposDocumento; track doc.id) {
+                <option [value]="doc.id">{{ doc.nombre }}</option>
+              }
+            </select>
+          </div>
+
+          <div class="grupo-campo">
+            <label class="etiqueta-campo" for="staff-num-doc">Número de documento *</label>
+            <input
+              id="staff-num-doc"
+              type="text"
+              class="entrada-texto"
+              [value]="nuevoStaff.numero_documento"
+              (input)="nuevoStaff.numero_documento = $any($event.target).value"
+              required
+            >
+          </div>
+
+          <div class="grupo-campo">
+            <label class="etiqueta-campo" for="staff-correo">Correo electrónico *</label>
+            <input
+              id="staff-correo"
+              type="email"
+              class="entrada-texto"
+              [value]="nuevoStaff.correo"
+              (input)="nuevoStaff.correo = $any($event.target).value"
+              required
+            >
+          </div>
+
+          <div class="grupo-campo">
+            <label class="etiqueta-campo" for="staff-usuario">Usuario *</label>
+            <input
+              id="staff-usuario"
+              type="text"
+              class="entrada-texto"
+              [value]="nuevoStaff.usuario"
+              (input)="nuevoStaff.usuario = $any($event.target).value"
+              required
+            >
+          </div>
+
+          <div class="grupo-campo">
+            <label class="etiqueta-campo" for="staff-contrasena">Contraseña *</label>
+            <input
+              id="staff-contrasena"
+              type="password"
+              class="entrada-texto"
+              [value]="nuevoStaff.contrasenia"
+              (input)="nuevoStaff.contrasenia = $any($event.target).value"
+              required
+            >
+          </div>
+
+          <div class="grupo-campo">
+            <label class="etiqueta-campo" for="staff-tipo-contrato">Tipo de contrato *</label>
+            <select
+              id="staff-tipo-contrato"
+              class="entrada-texto"
+              [value]="nuevoStaff.id_tipo_contrato"
+              (change)="nuevoStaff.id_tipo_contrato = +$any($event.target).value"
+            >
+              @for (contrato of tiposContrato; track contrato.id) {
+                <option [value]="contrato.id">{{ contrato.nombre }}</option>
+              }
+            </select>
+          </div>
+
+          <div class="grupo-campo">
+            <label class="etiqueta-campo" for="staff-fecha-inicio">Fecha de inicio *</label>
+            <input
+              id="staff-fecha-inicio"
+              type="date"
+              class="entrada-texto"
+              [value]="nuevoStaff.fecha_inicio"
+              (input)="nuevoStaff.fecha_inicio = $any($event.target).value"
+              required
+            >
+          </div>
+
+          <div class="grupo-campo">
+            <label class="etiqueta-campo" for="staff-salario">Salario *</label>
+            <input
+              id="staff-salario"
+              type="number"
+              class="entrada-texto"
+              [value]="nuevoStaff.salario"
+              (input)="nuevoStaff.salario = +$any($event.target).value"
+              required
+            >
+          </div>
+        </div>
+
+        <button type="submit" class="boton-enviar-sesion">Confirmar contratación</button>
+      </form>
+    </div>
+  </div>
+}
+
+@if (peliculaSeleccionada) {
+  <div class="fondo-modal" (click)="cerrarDetallePelicula()">
+    <div class="ventana-detalle-pelicula" (click)="$event.stopPropagation()">
+      <div class="encabezado-detalle">
+        <div>
+          <h2 class="titulo-detalle">{{ peliculaSeleccionada.titulo }}</h2>
+          <p class="subtitulo-detalle">{{ peliculaSeleccionada.tituloOriginal }}</p>
+        </div>
+        <button type="button" class="boton-cerrar-modal" (click)="cerrarDetallePelicula()" aria-label="Cerrar">×</button>
+      </div>
+
+      <div class="cuerpo-detalle">
+        <div class="columna-poster-detalle">
+          <img [src]="peliculaSeleccionada.poster" [alt]="'Póster de ' + peliculaSeleccionada.titulo" class="imagen-poster-detalle">
+          <button type="button" class="boton-funciones" (click)="abrirModalFunciones()">Ver funciones</button>
+        </div>
+
+        <div class="columna-informacion-detalle">
+          <div class="bloque-informacion">
+            <h3 class="titulo-bloque">Sinopsis</h3>
+            <p class="texto-sinopsis">{{ peliculaSeleccionada.sinopsis }}</p>
+          </div>
+
+          <div class="rejilla-ficha-tecnica">
+            <div class="tarjeta-dato">
+              <span class="etiqueta-dato">Duración</span>
+              <span class="valor-dato">{{ peliculaSeleccionada.duracion }}</span>
+            </div>
+            <div class="tarjeta-dato">
+              <span class="etiqueta-dato">Clasificación</span>
+              <span class="valor-dato">{{ peliculaSeleccionada.clasificacion }}</span>
+            </div>
+            <div class="tarjeta-dato">
+              <span class="etiqueta-dato">Idioma original</span>
+              <span class="valor-dato">{{ peliculaSeleccionada.idiomaOriginal }}</span>
+            </div>
+            <div class="tarjeta-dato">
+              <span class="etiqueta-dato">Audios disponibles</span>
+              <span class="valor-dato">{{ peliculaSeleccionada.audios.join(', ') }}</span>
+            </div>
+            <div class="tarjeta-dato tarjeta-dato-ancha">
+              <span class="etiqueta-dato">Subtítulos disponibles</span>
+              <span class="valor-dato">{{ peliculaSeleccionada.subtitulos.join(', ') }}</span>
+            </div>
+          </div>
+
+          <div class="bloque-informacion">
+            <h3 class="titulo-bloque">Elenco y dirección</h3>
+            <div class="lista-elenco">
+              @for (integrante of peliculaSeleccionada.elenco; track integrante.nombre) {
+                <div class="item-elenco">
+                  <span class="nombre-integrante">{{ integrante.nombre }}</span>
+                  <span class="rol-integrante">{{ integrante.rol }}</span>
+                </div>
+              }
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="seccion-resenas">
+        <h3 class="titulo-bloque">Reseñas de usuarios</h3>
+        <div class="lista-resenas">
+          @for (resena of peliculaSeleccionada.resenas; track resena.usuario) {
+            <article class="tarjeta-resena">
+              <div class="encabezado-resena">
+                <span class="usuario-resena">{{ resena.usuario }}</span>
+                <span class="calificacion-resena">{{ resena.calificacion }} / 5</span>
+              </div>
+              <p class="comentario-resena">{{ resena.comentario }}</p>
+              <div class="respuesta-empresa">
+                <span class="etiqueta-respuesta-empresa">Respuesta del cine:</span>
+                <p class="texto-respuesta-empresa">{{ resena.respuestaEmpresa }}</p>
+              </div>
+            </article>
+          }
+        </div>
+      </div>
+    </div>
+  </div>
+}
+
+@if (modalFuncionesAbierto && peliculaSeleccionada) {
+  <div class="fondo-modal fondo-modal-superior" (click)="cerrarModalFunciones()">
+    <div class="ventana-funciones" (click)="$event.stopPropagation()">
+      <div class="encabezado-modal">
+        <div>
+          <h2 class="titulo-modal">Funciones disponibles</h2>
+          <p class="subtitulo-funciones">{{ peliculaSeleccionada.titulo }}</p>
+        </div>
+        <button type="button" class="boton-cerrar-modal" (click)="cerrarModalFunciones()" aria-label="Cerrar">×</button>
+      </div>
+
+      <div class="bloque-fechas">
+        <h3 class="titulo-bloque">Fechas disponibles</h3>
+        <div class="lista-fechas-disponibles">
+          @for (funcion of peliculaSeleccionada.funciones; track funcion.fecha) {
+            <button
+              type="button"
+              class="dia-disponible-morado"
+              [class.dia-seleccionado]="fechaSeleccionada === funcion.fecha"
+              (click)="seleccionarFecha(funcion.fecha)"
+            >
+              {{ funcion.fecha }}
+            </button>
+          }
+        </div>
+      </div>
+
+      <div class="grupo-campo">
+        <label class="etiqueta-campo" for="select-staff-compra">¿Qué miembro de nuestro staff te asistió con tu compra?</label>
+        <select
+          id="select-staff-compra"
+          class="entrada-texto"
+          [value]="idStaffSeleccionadoCompra"
+          (change)="idStaffSeleccionadoCompra = +$any($event.target).value"
+        >
+          @for (taquillero of taquillerosActivos; track taquillero.id_staff) {
+            <option [value]="taquillero.id_staff">
+              {{ taquillero.primer_nombre }} {{ taquillero.primer_apellido }} ({{ taquillero.cargo_nombre }})
+            </option>
+          }
+        </select>
+      </div>
+
+      <div class="bloque-horas-funciones">
+        <h3 class="titulo-bloque">Horarios disponibles</h3>
+        <div class="lista-horas">
+          @for (hora of horasDisponibles; track hora) {
+            <div class="fila-horario">
+              <span class="hora-funcion-morada">{{ hora }}</span>
+              <button type="button" class="boton-comprar-boleta" (click)="comprarBoleta(hora)">
+                Comprar boleta
+              </button>
+            </div>
+          }
+        </div>
+      </div>
+    </div>
+  </div>
+}
+
+@if (modalAbierto) {
+  <div class="fondo-modal fondo-modal-auth" (click)="cerrarModal()">
+    <div class="ventana-modal" (click)="$event.stopPropagation()">
+      <div class="encabezado-modal">
+        <h2 class="titulo-modal">Iniciar sesión</h2>
+        <button type="button" class="boton-cerrar-modal" (click)="cerrarModal()" aria-label="Cerrar">×</button>
+      </div>
+
+      @if (errorLogin) {
+        <div class="aviso-error-modal">{{ errorLogin }}</div>
+      }
+
+      <form class="formulario-inicio-sesion" (submit)="enviarFormulario($event)">
+        <div class="grupo-campo">
+          <label class="etiqueta-campo" for="campo-correo">Correo electrónico o usuario</label>
+          <input
+            id="campo-correo"
+            type="text"
+            class="entrada-texto"
+            [class.entrada-error]="correoInvalido"
+            [value]="correo"
+            (input)="correo = $any($event.target).value; validarCorreo()"
+            autocomplete="username"
+          >
+          @if (correoInvalido) {
+            <span class="mensaje-error-campo">Ingresa un correo válido</span>
+          }
+        </div>
+
+        <div class="grupo-campo">
+          <label class="etiqueta-campo" for="campo-contrasena">Contraseña</label>
+          <div class="contenedor-contrasena">
+            <input
+              id="campo-contrasena"
+              [type]="mostrarContrasena ? 'text' : 'password'"
+              class="entrada-texto entrada-con-accion"
+              [value]="contrasena"
+              (input)="contrasena = $any($event.target).value"
+              autocomplete="current-password"
+            >
+            <button type="button" class="boton-mostrar-contrasena" (click)="alternarContrasena()">
+              {{ mostrarContrasena ? 'Ocultar' : 'Mostrar' }}
+            </button>
+          </div>
+        </div>
+
+        <button type="submit" class="boton-enviar-sesion">Iniciar sesión</button>
+      </form>
+
+      <div class="pie-modal">
+        <span class="texto-registro">¿No tienes cuenta? <a href="#" class="enlace-registro" (click)="abrirModalRegistro($event)">Créala aquí.</a></span>
+      </div>
+    </div>
+  </div>
+}
+
+@if (modalRegistroAbierto) {
+  <div class="fondo-modal fondo-modal-auth" (click)="cerrarModalRegistro()">
+    <div class="ventana-modal ventana-registro" (click)="$event.stopPropagation()">
+      <div class="encabezado-modal">
+        <h2 class="titulo-modal">Crear cuenta de espectador</h2>
+        <button type="button" class="boton-cerrar-modal" (click)="cerrarModalRegistro()" aria-label="Cerrar">×</button>
+      </div>
+
+      @if (errorRegistro) {
+        <div class="aviso-error-modal">{{ errorRegistro }}</div>
+      }
+
+      <form class="formulario-registro" (submit)="guardarUsuario($event)">
+        <div class="rejilla-registro">
+          <div class="grupo-campo">
+            <label class="etiqueta-campo" for="reg-primer-nombre">Primer nombre *</label>
+            <input
+              id="reg-primer-nombre"
+              type="text"
+              class="entrada-texto"
+              [value]="nuevoEspectador.primer_nombre"
+              (input)="nuevoEspectador.primer_nombre = $any($event.target).value"
+              required
+            >
+          </div>
+
+          <div class="grupo-campo">
+            <label class="etiqueta-campo" for="reg-segundo-nombre">Segundo nombre</label>
+            <input
+              id="reg-segundo-nombre"
+              type="text"
+              class="entrada-texto"
+              [value]="nuevoEspectador.segundo_nombre"
+              (input)="nuevoEspectador.segundo_nombre = $any($event.target).value"
+            >
+          </div>
+
+          <div class="grupo-campo">
+            <label class="etiqueta-campo" for="reg-primer-apellido">Primer apellido *</label>
+            <input
+              id="reg-primer-apellido"
+              type="text"
+              class="entrada-texto"
+              [value]="nuevoEspectador.primer_apellido"
+              (input)="nuevoEspectador.primer_apellido = $any($event.target).value"
+              required
+            >
+          </div>
+
+          <div class="grupo-campo">
+            <label class="etiqueta-campo" for="reg-segundo-apellido">Segundo apellido</label>
+            <input
+              id="reg-segundo-apellido"
+              type="text"
+              class="entrada-texto"
+              [value]="nuevoEspectador.segundo_apellido"
+              (input)="nuevoEspectador.segundo_apellido = $any($event.target).value"
+            >
+          </div>
+
+          <div class="grupo-campo">
+            <label class="etiqueta-campo" for="reg-tipo-doc">Tipo de documento *</label>
+            <select
+              id="reg-tipo-doc"
+              class="entrada-texto"
+              [value]="nuevoEspectador.id_tipo_documento"
+              (change)="nuevoEspectador.id_tipo_documento = +$any($event.target).value"
+            >
+              @for (doc of tiposDocumento; track doc.id) {
+                <option [value]="doc.id">{{ doc.nombre }}</option>
+              }
+            </select>
+          </div>
+
+          <div class="grupo-campo">
+            <label class="etiqueta-campo" for="reg-num-doc">Número de documento *</label>
+            <input
+              id="reg-num-doc"
+              type="text"
+              class="entrada-texto"
+              [value]="nuevoEspectador.numero_documento"
+              (input)="nuevoEspectador.numero_documento = $any($event.target).value"
+              required
+            >
+          </div>
+
+          <div class="grupo-campo">
+            <label class="etiqueta-campo" for="reg-correo">Correo electrónico *</label>
+            <input
+              id="reg-correo"
+              type="email"
+              class="entrada-texto"
+              [value]="nuevoEspectador.correo"
+              (input)="nuevoEspectador.correo = $any($event.target).value"
+              required
+            >
+          </div>
+
+          <div class="grupo-campo">
+            <label class="etiqueta-campo" for="reg-usuario">Usuario *</label>
+            <input
+              id="reg-usuario"
+              type="text"
+              class="entrada-texto"
+              [value]="nuevoEspectador.usuario"
+              (input)="nuevoEspectador.usuario = $any($event.target).value"
+              required
+            >
+          </div>
+        </div>
+
+        <div class="grupo-campo">
+          <label class="etiqueta-campo" for="reg-contrasena">Contraseña *</label>
+          <div class="contenedor-contrasena">
+            <input
+              id="reg-contrasena"
+              [type]="mostrarContrasenaRegistro ? 'text' : 'password'"
+              class="entrada-texto entrada-con-accion"
+              [value]="nuevoEspectador.contrasenia"
+              (input)="nuevoEspectador.contrasenia = $any($event.target).value"
+              required
+            >
+            <button type="button" class="boton-mostrar-contrasena" (click)="mostrarContrasenaRegistro = !mostrarContrasenaRegistro">
+              {{ mostrarContrasenaRegistro ? 'Ocultar' : 'Mostrar' }}
+            </button>
+          </div>
+        </div>
+
+        <button type="submit" class="boton-enviar-sesion" [disabled]="guardandoRegistro">
+          {{ guardandoRegistro ? 'Guardando...' : 'Guardar usuario' }}
+        </button>
+      </form>
+
+      <div class="pie-modal">
+        <span class="texto-registro">¿Ya tienes cuenta? <a href="#" class="enlace-registro" (click)="volverAIniciarSesion(); $event.preventDefault()">Inicia sesión aquí.</a></span>
+      </div>
+    </div>
+  </div>
+}

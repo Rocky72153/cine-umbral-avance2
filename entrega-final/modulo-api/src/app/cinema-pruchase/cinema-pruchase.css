@@ -1,0 +1,501 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+:host {
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  color: #18181b;
+}
+
+.fondo-compra {
+  position: fixed;
+  inset: 0;
+  background-color: rgba(24, 12, 38, 0.7);
+  backdrop-filter: blur(3px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  z-index: 400;
+  overflow-y: auto;
+}
+
+.ventana-compra {
+  width: 100%;
+  max-width: 1040px;
+  max-height: 92vh;
+  overflow-y: auto;
+  background-color: #ffffff;
+  border-radius: 18px;
+  padding: 28px;
+  box-shadow: 0 24px 60px rgba(63, 6, 112, 0.36);
+  border: 2px solid #e6d4f7;
+}
+
+.encabezado-compra {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 18px;
+}
+
+.titulo-compra {
+  font-size: 1.45rem;
+  font-weight: 700;
+  color: #3F0670;
+}
+
+.subtitulo-compra {
+  font-size: 0.9rem;
+  color: #6b7280;
+  margin-top: 4px;
+}
+
+.boton-cerrar-compra {
+  width: 36px;
+  height: 36px;
+  flex-shrink: 0;
+  border-radius: 50%;
+  border: none;
+  background-color: #f4ecfb;
+  color: #3F0670;
+  font-size: 1.4rem;
+  line-height: 1;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  transition: background-color 0.2s ease;
+}
+
+.boton-cerrar-compra:hover {
+  background-color: #e6d4f7;
+}
+
+.barra-pasos {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 10px;
+  margin-bottom: 24px;
+}
+
+.paso-indicador {
+  text-align: center;
+  padding: 10px 14px;
+  border-radius: 10px;
+  background-color: #f4ecfb;
+  color: #3F0670;
+  font-size: 0.88rem;
+  font-weight: 700;
+  border: 1.5px solid #dcc5f2;
+}
+
+.paso-activo {
+  background-color: #3F0670;
+  color: #ffffff;
+  border-color: #3F0670;
+}
+
+.contenido-sillas {
+  display: grid;
+  grid-template-columns: 290px 1fr;
+  gap: 26px;
+  align-items: start;
+}
+
+.panel-informacion-funcion {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.miniatura-poster {
+  width: 100%;
+  max-height: 210px;
+  object-fit: cover;
+  border-radius: 12px;
+  box-shadow: 0 6px 18px rgba(24, 24, 27, 0.12);
+}
+
+.tarjeta-requisitos-sala {
+  background-color: #f4ecfb;
+  border: 1.5px solid #3F0670;
+  border-radius: 12px;
+  padding: 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.etiqueta-sala {
+  align-self: flex-start;
+  background-color: #3F0670;
+  color: #ffffff;
+  font-size: 0.75rem;
+  font-weight: 700;
+  padding: 3px 10px;
+  border-radius: 9999px;
+}
+
+.titulo-requisitos {
+  font-size: 0.92rem;
+  font-weight: 700;
+  color: #3F0670;
+}
+
+.texto-requisitos {
+  font-size: 0.84rem;
+  color: #2a044d;
+  line-height: 1.45;
+}
+
+.resumen-boleta,
+.resumen-compra-final {
+  background-color: #faf7fd;
+  border: 1px solid #eadcf8;
+  border-radius: 12px;
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.fila-resumen {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  font-size: 0.86rem;
+  color: #374151;
+}
+
+.lista-chips-asientos {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.chip-asiento {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 3px 9px;
+  border-radius: 9999px;
+  background-color: #3F0670;
+  color: #ffffff;
+  font-size: 0.78rem;
+  font-weight: 700;
+}
+
+.quitar-chip-btn {
+  background: none;
+  border: none;
+  color: #ffffff;
+  font-size: 0.95rem;
+  line-height: 1;
+  cursor: pointer;
+}
+
+.total-resumen {
+  border-top: 1px solid #dcc5f2;
+  padding-top: 10px;
+  font-size: 1rem;
+  color: #3F0670;
+}
+
+.panel-mapa-sillas {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.leyenda-sillas {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 18px;
+}
+
+.item-leyenda {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: #374151;
+}
+
+.muestra {
+  width: 16px;
+  height: 16px;
+  border-radius: 4px;
+  display: inline-block;
+}
+
+.muestra-libre {
+  background-color: #f4ecfb;
+  border: 1.5px solid #3F0670;
+}
+
+.muestra-seleccionada {
+  background-color: #3F0670;
+  border: 1.5px solid #3F0670;
+}
+
+.muestra-ocupada {
+  background-color: #e5e7eb;
+  border: 1.5px solid #cbd5e1;
+}
+
+.aviso-modo-adicional {
+  padding: 9px 14px;
+  border-radius: 10px;
+  background-color: #f4ecfb;
+  border: 1.5px solid #3F0670;
+  color: #3F0670;
+  font-size: 0.84rem;
+  font-weight: 600;
+  text-align: center;
+}
+
+.pantalla-sala {
+  text-align: center;
+  padding: 8px 16px;
+  border-radius: 8px;
+  background-color: #3F0670;
+  color: #ffffff;
+  font-size: 0.78rem;
+  font-weight: 700;
+  letter-spacing: 2px;
+}
+
+.rejilla-sala {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  overflow-x: auto;
+  padding-bottom: 6px;
+}
+
+.fila-asientos {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.letra-fila {
+  width: 22px;
+  text-align: center;
+  font-size: 0.86rem;
+  font-weight: 700;
+  color: #3F0670;
+  flex-shrink: 0;
+}
+
+.grupo-asientos {
+  display: grid;
+  grid-template-columns: repeat(10, 1fr);
+  gap: 6px;
+  width: 100%;
+  min-width: 440px;
+}
+
+.asiento-btn {
+  height: 32px;
+  border-radius: 7px;
+  font-family: inherit;
+  font-size: 0.78rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.18s ease;
+}
+
+.asiento-libre {
+  background-color: #f4ecfb;
+  color: #3F0670;
+  border: 1.5px solid #3F0670;
+}
+
+.asiento-libre:hover {
+  background-color: #e6d4f7;
+  transform: translateY(-1px);
+}
+
+.asiento-seleccionado {
+  background-color: #3F0670;
+  color: #ffffff;
+  border: 1.5px solid #3F0670;
+  box-shadow: 0 4px 10px rgba(63, 6, 112, 0.28);
+}
+
+.asiento-ocupado {
+  background-color: #e5e7eb;
+  color: #9ca3af;
+  border: 1.5px solid #d1d5db;
+  cursor: not-allowed;
+}
+
+.barra-selector-inferior {
+  margin-top: 8px;
+  padding-top: 16px;
+  border-top: 1px solid #e5e7eb;
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 16px;
+}
+
+.selector-asiento-grupo {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.etiqueta-selector,
+.etiqueta-campo-compra {
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: #3F0670;
+}
+
+.selector-asiento,
+.entrada-compra {
+  height: 44px;
+  min-width: 195px;
+  padding: 0 14px;
+  border: 1.5px solid #3F0670;
+  border-radius: 10px;
+  background-color: #ffffff;
+  color: #18181b;
+  font-family: inherit;
+  font-size: 0.92rem;
+  font-weight: 600;
+  outline: none;
+}
+
+.boton-continuar-compra {
+  height: 44px;
+  padding: 0 22px;
+  border: none;
+  border-radius: 9999px;
+  background-color: #3F0670;
+  color: #ffffff;
+  font-family: inherit;
+  font-size: 0.88rem;
+  font-weight: 700;
+  cursor: pointer;
+  box-shadow: 0 6px 16px rgba(63, 6, 112, 0.25);
+  transition: background-color 0.2s ease, transform 0.2s ease;
+}
+
+.boton-continuar-compra:hover:not(:disabled) {
+  background-color: #530992;
+  transform: translateY(-1px);
+}
+
+.boton-continuar-compra:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.seccion-realizar-compra {
+  display: grid;
+  grid-template-columns: 1fr 1.15fr;
+  gap: 24px;
+  align-items: start;
+}
+
+.titulo-bloque-compra {
+  font-size: 1rem;
+  font-weight: 700;
+  color: #3F0670;
+  margin-bottom: 6px;
+}
+
+.formulario-realizar-compra {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.grupo-campo-compra {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.acciones-compra-final {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: 10px;
+  margin-top: 6px;
+}
+
+.boton-secundario-compra {
+  height: 44px;
+  padding: 0 18px;
+  border-radius: 9999px;
+  border: 1.5px solid #3F0670;
+  background-color: #ffffff;
+  color: #3F0670;
+  font-family: inherit;
+  font-size: 0.86rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+.boton-secundario-compra:hover {
+  background-color: #f4ecfb;
+}
+
+.boton-agregar-boleta {
+  height: 44px;
+  padding: 0 18px;
+  border-radius: 9999px;
+  border: 1.5px solid #3F0670;
+  background-color: #f4ecfb;
+  color: #3F0670;
+  font-family: inherit;
+  font-size: 0.86rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+.boton-agregar-boleta:hover {
+  background-color: #e6d4f7;
+}
+
+.confirmacion-compra {
+  background-color: #f4ecfb;
+  border: 1.5px solid #3F0670;
+  border-radius: 12px;
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.texto-confirmacion {
+  font-size: 0.94rem;
+  font-weight: 600;
+  color: #2a044d;
+  line-height: 1.5;
+}
+
+@media (max-width: 860px) {
+  .contenido-sillas,
+  .seccion-realizar-compra {
+    grid-template-columns: 1fr;
+  }
+
+  .ventana-compra {
+    padding: 20px;
+  }
+}
