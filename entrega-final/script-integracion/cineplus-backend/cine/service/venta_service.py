@@ -24,6 +24,8 @@ class VentaService:
         id_staff = _entero(datos.get("id_staff"))
         id_funcion = _entero(datos.get("id_funcion"))
         if id_funcion is None and _entero(datos.get("id_pelicula")):
+            # El front no tiene el id de la función: se reutiliza la consulta
+            # de funciones que ya existía en FuncionRepository
             for funcion in FuncionRepository.obtener_funciones_por_pelicula(_entero(datos["id_pelicula"])):
                 if funcion["fecha"] == datos.get("fecha") and funcion["hora"] == datos.get("hora"):
                     id_funcion = funcion["id_funcion"]
@@ -89,3 +91,18 @@ class VentaService:
 
         venta["id_registro_mongo"] = id_registro
         return {"ok": True, "venta": venta}
+
+    @staticmethod
+    def listar_boletas_espectador(id_espectador: int) -> list:
+     
+        ventas = VentaRepository.listar_por_espectador(id_espectador)
+
+
+        try:
+            estados = VentaMongoRepository.obtener_estados([v["id_venta"] for v in ventas])
+        except PyMongoError:
+            estados = {}
+
+        for venta in ventas:
+            venta["estado_mongo"] = estados.get(venta["id_venta"], "sin registro en MongoDB")
+        return ventas

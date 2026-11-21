@@ -184,7 +184,9 @@ export class CinemaMain implements OnInit {
   espectadoresGuardados: EspectadorRegistro[] = [];
   miembrosStaff: MiembroStaff[] = [];
   sesionActiva: SesionActiva | null = null;
-  pestanaActiva: 'cartelera' | 'staff' = 'cartelera';
+  pestanaActiva: 'cartelera' | 'staff' | 'boletas' = 'cartelera';
+  misBoletas: any[] = [];
+  cargandoBoletas = false;
 
   modalAbierto = false;
   mostrarContrasena = false;
@@ -385,11 +387,35 @@ export class CinemaMain implements OnInit {
     }
   }
 
-  seleccionarPestana(pestana: 'cartelera' | 'staff'): void {
+  seleccionarPestana(pestana: 'cartelera' | 'staff' | 'boletas'): void {
     if (pestana === 'staff' && !this.esAdministrador) {
       return;
     }
     this.pestanaActiva = pestana;
+    if (pestana === 'boletas') {
+      this.cargarMisBoletas();
+    }
+  }
+
+  private cargarMisBoletas(): void {
+    if (this.sesionActiva?.tipo !== 'espectador') {
+      return;
+    }
+    this.cargandoBoletas = true;
+    this.http
+      .get<ApiResponse<any[]>>(`${this.apiBaseUrl}/espectadores/${this.sesionActiva.id_usuario}/boletas/`)
+      .subscribe({
+        next: resp => {
+          this.misBoletas = resp.data ?? [];
+          this.cargandoBoletas = false;
+          this.cdr.detectChanges();
+        },
+        error: () => {
+          this.misBoletas = [];
+          this.cargandoBoletas = false;
+          this.cdr.detectChanges();
+        }
+      });
   }
 
   abrirModal(): void {
@@ -468,7 +494,7 @@ export class CinemaMain implements OnInit {
           }
           this.cdr.detectChanges();
         },
-        // Si no es staff, se intenta como espectador (lógica que ya existía)
+       
         error: () => {
           this.iniciarSesionEspectador(identificador, clave);
           this.cdr.detectChanges();

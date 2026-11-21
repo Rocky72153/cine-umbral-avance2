@@ -23,3 +23,9 @@ def registrar_venta_view(request):
         return JsonResponse({"status": "error", "errors": resultado["errores"]}, status=400)
 
     return JsonResponse({"status": "success", "data": resultado["venta"]}, status=201)
+
+
+@require_http_methods(["GET"])
+def boletas_espectador_view(request, id_espectador):
+    boletas = VentaService.listar_boletas_espectador(id_espectador)
+    return JsonResponse({"status": "success", "data": boletas}, status=200)

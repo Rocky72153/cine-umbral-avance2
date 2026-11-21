@@ -23,6 +23,25 @@
           Cartelera
         </button>
       </nav>
+    } @else if (sesionActiva?.tipo === 'espectador') {
+      <nav class="navegacion-superior">
+        <button
+          type="button"
+          class="boton-pestana"
+          [class.pestana-activa]="pestanaActiva === 'cartelera'"
+          (click)="seleccionarPestana('cartelera')"
+        >
+          Cartelera
+        </button>
+        <button
+          type="button"
+          class="boton-pestana"
+          [class.pestana-activa]="pestanaActiva === 'boletas'"
+          (click)="seleccionarPestana('boletas')"
+        >
+          Mis boletas
+        </button>
+      </nav>
     }
 
     @if (sesionActiva) {
@@ -96,6 +115,52 @@
           </article>
         }
       </div>
+    </section>
+  } @else if (pestanaActiva === 'boletas' && sesionActiva?.tipo === 'espectador') {
+    <section class="seccion-gestion-staff">
+      <div class="encabezado-seccion">
+        <div class="indicador-titulo"></div>
+        <h2 class="titulo-seccion">Mis boletas</h2>
+      </div>
+
+      @if (cargandoBoletas) {
+        <p class="mensaje-estado">Cargando tus compras...</p>
+      } @else if (misBoletas.length === 0) {
+        <p class="mensaje-estado">Todavía no tienes compras registradas.</p>
+      } @else {
+        <div class="lista-staff">
+          @for (venta of misBoletas; track venta.id_venta) {
+            <article class="tarjeta-miembro-staff">
+              <div class="cabecera-miembro">
+                <div>
+                  <h3 class="nombre-miembro">{{ venta.pelicula }}</h3>
+                  <span class="usuario-miembro">
+                    Compra #{{ venta.id_venta }} · {{ venta.fecha_funcion }} · {{ venta.hora_funcion }} · Sala {{ venta.sala }}
+                  </span>
+                </div>
+                <span class="badge-cargo">{{ venta.estado_mongo }}</span>
+              </div>
+
+              <div class="datos-miembro">
+                @for (boleta of venta.boletas; track boleta.asiento) {
+                  <div class="dato-staff">
+                    <span class="etiqueta-dato">Asiento {{ boleta.asiento }}</span>
+                    <span class="valor-dato">{{ boleta.tipo }} · ${{ boleta.precio }}</span>
+                  </div>
+                }
+                <div class="dato-staff">
+                  <span class="etiqueta-dato">Total</span>
+                  <span class="valor-dato">${{ venta.monto_total }} · {{ venta.metodo_pago }}</span>
+                </div>
+                <div class="dato-staff">
+                  <span class="etiqueta-dato">Atendido por</span>
+                  <span class="valor-dato">{{ venta.staff }}</span>
+                </div>
+              </div>
+            </article>
+          }
+        </div>
+      }
     </section>
   } @else {
     <section class="seccion-peliculas-destacadas">
