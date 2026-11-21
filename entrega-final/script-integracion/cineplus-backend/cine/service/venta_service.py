@@ -1,5 +1,9 @@
-from django.db import DatabaseError, transaction
+from datetime import datetime, timezone
 
+from django.db import DatabaseError, transaction
+from pymongo.errors import PyMongoError
+
+from cine.repository.venta_mongo_repository import VentaMongoRepository
 from cine.repository.venta_repository import VentaRepository
 
 
@@ -57,13 +61,26 @@ class VentaService:
 
         try:
             with transaction.atomic():
+               
                 id_venta = VentaRepository.registrar_venta(
                     id_staff, id_funcion, id_espectador, id_metodo_pago,
                     asientos, tipos_boleta, precios,
                 )
+                venta = VentaRepository.obtener_por_id(id_venta)
+
+               
+                id_registro = VentaMongoRepository.guardar_registro({
+                    **venta,
+                    "canal": "web",
+                    "estado": "confirmada",
+                    "registrado_en": datetime.now(timezone.utc),
+                })
+               
         except DatabaseError as error:
-            # Mensaje del procedimiento, p. ej. "asientos ya fueron vendidos"
             mensaje = str(error).split("\n")[0].replace("sp_registrar_venta: ", "")
             return {"ok": False, "errores": {"venta": mensaje}}
+        except PyMongoError:
+            return {"ok": False, "errores": {"venta": "No se pudo guardar el registro en MongoDB; la venta no se registró en PostgreSQL"}}
 
-        return {"ok": True, "venta": VentaRepository.obtener_por_id(id_venta)}
+        venta["id_registro_mongo"] = id_registro
+        return {"ok": True, "venta": venta}
