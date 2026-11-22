@@ -54,6 +54,8 @@ CREATE TABLE Staff (
     segundo_apellido VARCHAR(50),
     numero_documento VARCHAR(20) NOT NULL UNIQUE,
     correo VARCHAR(100) UNIQUE,
+    usuario VARCHAR(50) NOT NULL UNIQUE,
+    contrasenia VARCHAR(255) NOT NULL,
     FOREIGN KEY (id_cargo_staff) REFERENCES Cargo_Staff(id_cargo_staff),
     FOREIGN KEY (id_estado_staff) REFERENCES Estado_Staff(id_estado_staff),
     FOREIGN KEY (id_tipo_documento) REFERENCES Tipo_Documento(id_tipo_documento)
@@ -78,6 +80,8 @@ CREATE TABLE Espectador (
     segundo_apellido VARCHAR(50),
     numero_documento VARCHAR(20) NOT NULL UNIQUE,
     correo VARCHAR(100) UNIQUE,
+    usuario VARCHAR(50) NOT NULL UNIQUE,
+    contrasenia VARCHAR(255) NOT NULL,
     FOREIGN KEY (id_tipo_documento) REFERENCES Tipo_Documento(id_tipo_documento)
 );
 
@@ -87,7 +91,7 @@ CREATE TABLE Actor_Director (
     segundo_nombre VARCHAR(50),
     primer_apellido VARCHAR(50) NOT NULL,
     segundo_apellido VARCHAR(50),
-    rol VARCHAR(50) NOT NULL, 
+    rol VARCHAR(50) NOT NULL,
     nacionalidad VARCHAR(50),
     correo VARCHAR(100)
 );
@@ -96,7 +100,7 @@ CREATE TABLE Pelicula (
     id_pelicula SERIAL PRIMARY KEY,
     id_clasificacion_pelicula INT NOT NULL,
     titulo VARCHAR(150) NOT NULL,
-    duracion INT NOT NULL, 
+    duracion INT NOT NULL,
     anio INT NOT NULL,
     pais_origen VARCHAR(50),
     FOREIGN KEY (id_clasificacion_pelicula) REFERENCES Clasificacion_Pelicula(id_clasificacion_pelicula)
@@ -154,7 +158,6 @@ CREATE TABLE Boleta (
     FOREIGN KEY (id_tipo_boleta) REFERENCES Tipo_Boleta(id_tipo_boleta)
 );
 
--- Índices solicitados en la retroalimentación del avance 1.
 CREATE INDEX idx_venta_funcion ON Venta(id_funcion);
 CREATE INDEX idx_boleta_venta ON Boleta(id_venta);
 CREATE INDEX idx_funcion_sala_fecha ON Funcion(id_sala, fecha);
