@@ -1,31 +1,18 @@
-import json
-
 from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
-from django.views.decorators.http import require_http_methods
 
+from cine.api_errors import api_endpoint, entero, leer_json
 from cine.service.venta_service import VentaService
 
 
 @csrf_exempt
-@require_http_methods(["POST"])
+@api_endpoint("POST")
 def registrar_venta_view(request):
-    try:
-        cuerpo = json.loads(request.body.decode("utf-8"))
-    except (UnicodeDecodeError, json.JSONDecodeError):
-        return JsonResponse(
-            {"status": "error", "message": "El cuerpo de la petición no es un JSON válido"},
-            status=400,
-        )
-
-    resultado = VentaService.registrar_compra(cuerpo)
-    if not resultado["ok"]:
-        return JsonResponse({"status": "error", "errors": resultado["errores"]}, status=400)
-
-    return JsonResponse({"status": "success", "data": resultado["venta"]}, status=201)
+    venta = VentaService.registrar_compra(leer_json(request))
+    return JsonResponse({"status": "success", "data": venta}, status=201)
 
 
-@require_http_methods(["GET"])
+@api_endpoint("GET")
 def boletas_espectador_view(request, id_espectador):
-    boletas = VentaService.listar_boletas_espectador(id_espectador)
+    boletas = VentaService.listar_boletas_espectador(entero(id_espectador, "id_espectador"))
     return JsonResponse({"status": "success", "data": boletas}, status=200)

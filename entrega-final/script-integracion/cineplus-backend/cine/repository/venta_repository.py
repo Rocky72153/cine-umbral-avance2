@@ -1,7 +1,13 @@
-from django.db import connection
+from django.db import DatabaseError, connection
 
 
 class VentaRepository:
+
+    @staticmethod
+    def existe_espectador(id_espectador: int) -> bool:
+        with connection.cursor() as cursor:
+            cursor.execute("SELECT 1 FROM Espectador WHERE id_espectador = %s", [id_espectador])
+            return cursor.fetchone() is not None
 
     @staticmethod
     def registrar_venta(id_staff, id_funcion, id_espectador, id_metodo_pago,
@@ -21,6 +27,8 @@ class VentaRepository:
             ])
             fila = cursor.fetchone()
 
+        if not fila or type(fila[0]) is not int or fila[0] <= 0:
+            raise DatabaseError("El procedimiento no devolvió un identificador de venta válido.")
         return fila[0]
 
     @staticmethod

@@ -1,3 +1,5 @@
+from pymongo.errors import PyMongoError
+
 from cine.mongo import obtener_coleccion_mongo
 
 
@@ -7,6 +9,8 @@ class VentaMongoRepository:
     def guardar_registro(documento: dict) -> str:
         coleccion = obtener_coleccion_mongo("registros_ventas")
         resultado = coleccion.insert_one(dict(documento))
+        if not resultado.acknowledged or resultado.inserted_id is None:
+            raise PyMongoError("MongoDB no confirmó el registro de venta.")
         return str(resultado.inserted_id)
 
     @staticmethod

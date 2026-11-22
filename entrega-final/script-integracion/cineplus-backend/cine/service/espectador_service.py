@@ -30,7 +30,6 @@ class EspectadorService:
         return TipoDocumentoRepository.obtener_todos()
 
     @staticmethod
-    @transaction.atomic
     def registrar_espectador(dto: RegistroEspectadorDTO) -> dict:
         errores = {}
 
@@ -43,10 +42,9 @@ class EspectadorService:
         usuario = dto.usuario.strip() if isinstance(dto.usuario, str) else ""
         contrasenia = dto.contrasenia if isinstance(dto.contrasenia, str) else ""
 
-        try:
-            id_tipo_documento = int(dto.id_tipo_documento)
-        except (TypeError, ValueError):
-            id_tipo_documento = 0
+        id_tipo_documento = dto.id_tipo_documento
+        if type(id_tipo_documento) is not int or not 1 <= id_tipo_documento <= 2_147_483_647:
+            errores["id_tipo_documento"] = "El tipo de documento debe ser un identificador válido"
 
         if not primer_nombre:
             errores["primer_nombre"] = "El primer nombre es obligatorio"
@@ -55,6 +53,8 @@ class EspectadorService:
 
         if segundo_nombre and len(segundo_nombre) > 50:
             errores["segundo_nombre"] = "El segundo nombre no puede superar 50 caracteres"
+        elif dto.segundo_nombre is not None and not isinstance(dto.segundo_nombre, str):
+            errores["segundo_nombre"] = "El segundo nombre debe ser texto"
 
         if not primer_apellido:
             errores["primer_apellido"] = "El primer apellido es obligatorio"
@@ -63,48 +63,59 @@ class EspectadorService:
 
         if segundo_apellido and len(segundo_apellido) > 50:
             errores["segundo_apellido"] = "El segundo apellido no puede superar 50 caracteres"
-
-        tipo_documento = TipoDocumentoRepository.obtener_por_id(id_tipo_documento)
-        if not tipo_documento:
-            errores["id_tipo_documento"] = "El tipo de documento seleccionado no existe"
+        elif dto.segundo_apellido is not None and not isinstance(dto.segundo_apellido, str):
+            errores["segundo_apellido"] = "El segundo apellido debe ser texto"
 
         if not numero_documento:
             errores["numero_documento"] = "El número de documento es obligatorio"
         elif len(numero_documento) > 20:
             errores["numero_documento"] = "El número de documento no puede superar 20 caracteres"
-        elif EspectadorRepository.existe_documento(numero_documento):
-            errores["numero_documento"] = "Ya existe un espectador con ese número de documento"
 
-        if not correo or not re.match(r"^[^\s@]+@[^\s@]+\.[^\s@]+$", correo):
-            errores["correo"] = "Ingresa un correo electrónico válido"
-        elif len(correo) > 100:
+        if len(correo) > 100:
             errores["correo"] = "El correo no puede superar 100 caracteres"
-        elif EspectadorRepository.existe_correo(correo):
-            errores["correo"] = "Ya existe un espectador con ese correo"
+        elif not re.fullmatch(r"[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}", correo):
+            errores["correo"] = "Ingresa un correo electrónico válido"
 
         if not usuario:
             errores["usuario"] = "El nombre de usuario es obligatorio"
         elif len(usuario) > 50:
             errores["usuario"] = "El nombre de usuario no puede superar 50 caracteres"
-        elif EspectadorRepository.existe_usuario(usuario):
-            errores["usuario"] = "Ya existe un espectador con ese nombre de usuario"
 
-        if not contrasenia or len(contrasenia) < 6:
+        if not contrasenia.strip() or len(contrasenia) < 6:
             errores["contrasenia"] = "La contraseña debe tener al menos 6 caracteres"
+        elif len(contrasenia) > 4096:
+            errores["contrasenia"] = "La contraseña no puede superar 4096 caracteres"
 
         if errores:
             return {"ok": False, "errores": errores}
 
-        nuevo_id = EspectadorRepository.guardar({
-            "id_tipo_documento": tipo_documento["id_tipo_documento"],
-            "primer_nombre": primer_nombre,
-            "segundo_nombre": segundo_nombre,
-            "primer_apellido": primer_apellido,
-            "segundo_apellido": segundo_apellido,
-            "numero_documento": numero_documento,
-            "correo": correo,
-            "usuario": usuario,
-            "contrasenia": make_password(contrasenia),
-        })
-        espectador_creado = EspectadorRepository.obtener_por_id(nuevo_id)
-        return {"ok": True, "espectador": convertir_a_dto(espectador_creado).__dict__}
+        with transaction.atomic():
+            tipo_documento = TipoDocumentoRepository.obtener_por_id(id_tipo_documento)
+            if not tipo_documento:
+                errores["id_tipo_documento"] = "El tipo de documento seleccionado no existe"
+            if EspectadorRepository.existe_documento(numero_documento):
+                errores["numero_documento"] = "Ya existe un espectador con ese número de documento"
+            if EspectadorRepository.existe_correo(correo):
+                errores["correo"] = "Ya existe un espectador con ese correo"
+            if EspectadorRepository.existe_usuario(usuario):
+                errores["usuario"] = "Ya existe un espectador con ese nombre de usuario"
+            if errores:
+                return {
+                    "ok": False,
+                    "errores": errores,
+                    "duplicado": tipo_documento is not None,
+                }
+
+            nuevo_id = EspectadorRepository.guardar({
+                "id_tipo_documento": id_tipo_documento,
+                "primer_nombre": primer_nombre,
+                "segundo_nombre": segundo_nombre,
+                "primer_apellido": primer_apellido,
+                "segundo_apellido": segundo_apellido,
+                "numero_documento": numero_documento,
+                "correo": correo,
+                "usuario": usuario,
+                "contrasenia": make_password(contrasenia),
+            })
+            espectador_creado = EspectadorRepository.obtener_por_id(nuevo_id)
+            return {"ok": True, "espectador": convertir_a_dto(espectador_creado).__dict__}

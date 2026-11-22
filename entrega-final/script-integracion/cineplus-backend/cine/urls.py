@@ -1,5 +1,6 @@
-from django.urls import path
+from django.urls import path, re_path
 
+from cine.api_errors import ruta_no_encontrada
 from cine.controller.espectador_controller import (
     listar_tipos_documento_view,
     registrar_espectador_view,
@@ -20,12 +21,13 @@ urlpatterns = [
     path("tipos-documento/", listar_tipos_documento_view),
     path("espectadores/registro/", registrar_espectador_view),
     path("peliculas/", listar_peliculas_view),
-    path("peliculas/<int:id_pelicula>/resenas/", pelicula_con_resenas_view),
-    path("funciones/<int:id_funcion>/requisitos/", funcion_con_requisitos_view),
+    path("peliculas/<str:id_pelicula>/resenas/", pelicula_con_resenas_view),
+    path("funciones/<str:id_funcion>/requisitos/", funcion_con_requisitos_view),
     path("reportes/ventas-incidentes-sala/", ventas_incidentes_por_sala_view),
     path("ventas/", registrar_venta_view),
-    path("espectadores/<int:id_espectador>/boletas/", boletas_espectador_view),
+    path("espectadores/<str:id_espectador>/boletas/", boletas_espectador_view),
     path("staff/", listar_staff_view),
     path("staff/login/", login_staff_view),
     path("staff/contratar/", contratar_staff_view),
+    re_path(r"^", ruta_no_encontrada),
 ]

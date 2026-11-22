@@ -1,47 +1,30 @@
-from functools import wraps
-
-from django.db import DatabaseError
 from django.http import JsonResponse
-from django.views.decorators.http import require_http_methods
-from pymongo.errors import PyMongoError
 
+from cine.api_errors import ApiError, api_endpoint, entero
 from cine.service.integracion_service import IntegracionService, NoEncontradoError
 
 
-def manejar_errores(vista):
-    @wraps(vista)
-    def envoltura(request, *args, **kwargs):
-        try:
-            return vista(request, *args, **kwargs)
-        except NoEncontradoError as error:
-            return JsonResponse({"status": "error", "message": str(error)}, status=404)
-        except PyMongoError:
-            return JsonResponse(
-                {"status": "error", "message": "No se pudo consultar MongoDB"}, status=503
-            )
-        except DatabaseError:
-            return JsonResponse(
-                {"status": "error", "message": "No se pudo consultar PostgreSQL"}, status=503
-            )
-    return envoltura
-
-
-@require_http_methods(["GET"])
-@manejar_errores
+@api_endpoint("GET")
 def pelicula_con_resenas_view(request, id_pelicula):
-    datos = IntegracionService.pelicula_con_resenas(id_pelicula)
+    id_pelicula = entero(id_pelicula, "id_pelicula")
+    try:
+        datos = IntegracionService.pelicula_con_resenas(id_pelicula)
+    except NoEncontradoError as error:
+        raise ApiError(404, "no_encontrado", str(error)) from error
     return JsonResponse({"status": "success", "data": datos}, status=200)
 
 
-@require_http_methods(["GET"])
-@manejar_errores
+@api_endpoint("GET")
 def funcion_con_requisitos_view(request, id_funcion):
-    datos = IntegracionService.funcion_con_requisitos(id_funcion)
+    id_funcion = entero(id_funcion, "id_funcion")
+    try:
+        datos = IntegracionService.funcion_con_requisitos(id_funcion)
+    except NoEncontradoError as error:
+        raise ApiError(404, "no_encontrado", str(error)) from error
     return JsonResponse({"status": "success", "data": datos}, status=200)
 
 
-@require_http_methods(["GET"])
-@manejar_errores
+@api_endpoint("GET")
 def ventas_incidentes_por_sala_view(request):
     datos = IntegracionService.ventas_e_incidentes_por_sala()
     return JsonResponse({"status": "success", "data": datos}, status=200)
