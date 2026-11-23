@@ -28,14 +28,15 @@ INSERT INTO Tipo_Sala (id_tipo_sala, nombre) VALUES
 INSERT INTO Estado_Sala (id_estado_sala, nombre) VALUES
 (1, 'Disponible'), (2, 'Mantenimiento'), (3, 'Fuera de servicio');
 
+-- Estas filas son datos de ejemplo; la contraseña vacía desactiva el acceso.
 INSERT INTO Staff
-(id_staff, id_cargo_staff, id_estado_staff, id_tipo_documento, primer_nombre, segundo_nombre, primer_apellido, segundo_apellido, numero_documento, correo)
+(id_staff, id_cargo_staff, id_estado_staff, id_tipo_documento, primer_nombre, segundo_nombre, primer_apellido, segundo_apellido, numero_documento, correo, usuario, contrasenia)
 VALUES
-(1, 3, 1, 1, 'Laura', 'Marcela', 'Gómez', 'Ruiz', '100100001', 'laura.gomez@cineplus.co'),
-(2, 2, 1, 1, 'Andrés', NULL, 'Martínez', 'López', '100100002', 'andres.martinez@cineplus.co'),
-(3, 1, 1, 1, 'Daniela', 'Sofía', 'Rodríguez', 'Pérez', '100100003', 'daniela.rodriguez@cineplus.co'),
-(4, 1, 1, 1, 'Juan', 'David', 'Hernández', 'Díaz', '100100004', 'juan.hernandez@cineplus.co'),
-(5, 1, 1, 1, 'Valentina', NULL, 'Torres', 'Castro', '100100005', 'valentina.torres@cineplus.co');
+(1, 3, 1, 1, 'Laura', 'Marcela', 'Gómez', 'Ruiz', '100100001', 'laura.gomez@cineplus.co', 'staff_demo_01', ''),
+(2, 2, 1, 1, 'Andrés', NULL, 'Martínez', 'López', '100100002', 'andres.martinez@cineplus.co', 'staff_demo_02', ''),
+(3, 1, 1, 1, 'Daniela', 'Sofía', 'Rodríguez', 'Pérez', '100100003', 'daniela.rodriguez@cineplus.co', 'staff_demo_03', ''),
+(4, 1, 1, 1, 'Juan', 'David', 'Hernández', 'Díaz', '100100004', 'juan.hernandez@cineplus.co', 'staff_demo_04', ''),
+(5, 1, 1, 1, 'Valentina', NULL, 'Torres', 'Castro', '100100005', 'valentina.torres@cineplus.co', 'staff_demo_05', '');
 
 INSERT INTO Contrato (id_contrato, id_staff, id_tipo_contrato, fecha_inicio, salario) VALUES
 (1, 1, 1, '2022-02-01', 4200000.00),
@@ -77,37 +78,38 @@ INSERT INTO Actor_Director (id_actor_director, primer_nombre, segundo_nombre, pr
 (29, 'Elisa', 'María', 'Bustos', 'Quintero', 'Actor', 'Argentina', 'elisa.bustos@example.com'),
 (30, 'Franco', NULL, 'Beltrán', 'Suárez', 'Director', 'Colombia', 'franco.beltran@example.com');
 
-INSERT INTO Espectador (id_espectador, id_tipo_documento, primer_nombre, segundo_nombre, primer_apellido, segundo_apellido, numero_documento, correo) VALUES
-(1, 1, 'Ana', 'María', 'García', 'López', '200200001', 'espectador01@example.com'),
-(2, 1, 'Carlos', NULL, 'Pérez', 'Ramírez', '200200002', 'espectador02@example.com'),
-(3, 1, 'Luisa', 'Fernanda', 'Martínez', 'Díaz', '200200003', 'espectador03@example.com'),
-(4, 1, 'Andrés', NULL, 'Rodríguez', 'Gómez', '200200004', 'espectador04@example.com'),
-(5, 1, 'Natalia', 'Sofía', 'López', 'Castro', '200200005', 'espectador05@example.com'),
-(6, 1, 'Felipe', NULL, 'Hernández', 'Ruiz', '200200006', 'espectador06@example.com'),
-(7, 1, 'Sara', 'Isabel', 'Torres', 'Moreno', '200200007', 'espectador07@example.com'),
-(8, 2, 'David', NULL, 'Vargas', 'Rojas', '200200008', 'espectador08@example.com'),
-(9, 1, 'Manuela', 'Alejandra', 'Jiménez', 'Pardo', '200200009', 'espectador09@example.com'),
-(10, 1, 'Miguel', NULL, 'Castillo', 'Reyes', '200200010', 'espectador10@example.com'),
-(11, 1, 'Juliana', 'Paola', 'Cruz', 'Mendoza', '200200011', 'espectador11@example.com'),
-(12, 1, 'Santiago', NULL, 'Ortiz', 'Vega', '200200012', 'espectador12@example.com'),
-(13, 1, 'Gabriela', 'Lucía', 'Suárez', 'Herrera', '200200013', 'espectador13@example.com'),
-(14, 1, 'Juan', NULL, 'Romero', 'Silva', '200200014', 'espectador14@example.com'),
-(15, 1, 'Mariana', 'Isabel', 'Navarro', 'León', '200200015', 'espectador15@example.com'),
-(16, 2, 'Nicolás', NULL, 'Mora', 'Acosta', '200200016', 'espectador16@example.com'),
-(17, 1, 'Valentina', 'Andrea', 'Ríos', 'Peña', '200200017', 'espectador17@example.com'),
-(18, 1, 'Samuel', NULL, 'Cárdenas', 'Ocampo', '200200018', 'espectador18@example.com'),
-(19, 1, 'Isabella', 'Sofía', 'Mejía', 'Fuentes', '200200019', 'espectador19@example.com'),
-(20, 1, 'Tomás', NULL, 'Salazar', 'Duarte', '200200020', 'espectador20@example.com'),
-(21, 1, 'Camila', 'Fernanda', 'Prieto', 'Cortés', '200200021', 'espectador21@example.com'),
-(22, 1, 'Emilio', NULL, 'Pineda', 'Aguilar', '200200022', 'espectador22@example.com'),
-(23, 1, 'Daniela', 'María', 'Molina', 'Campos', '200200023', 'espectador23@example.com'),
-(24, 2, 'Sebastián', NULL, 'Luna', 'Cabrera', '200200024', 'espectador24@example.com'),
-(25, 1, 'Paula', 'Andrea', 'Arias', 'Serrano', '200200025', 'espectador25@example.com'),
-(26, 1, 'Mateo', NULL, 'Vidal', 'Correa', '200200026', 'espectador26@example.com'),
-(27, 1, 'Antonella', 'Isabel', 'Quintero', 'Bustos', '200200027', 'espectador27@example.com'),
-(28, 1, 'Joaquín', NULL, 'Beltrán', 'Patiño', '200200028', 'espectador28@example.com'),
-(29, 1, 'Renata', 'Lucía', 'Montoya', 'Soto', '200200029', 'espectador29@example.com'),
-(30, 1, 'Esteban', NULL, 'Núñez', 'Navarrete', '200200030', 'espectador30@example.com');
+-- Estas filas son datos de ejemplo; la contraseña vacía desactiva el acceso.
+INSERT INTO Espectador (id_espectador, id_tipo_documento, primer_nombre, segundo_nombre, primer_apellido, segundo_apellido, numero_documento, correo, usuario, contrasenia) VALUES
+(1, 1, 'Ana', 'María', 'García', 'López', '200200001', 'espectador01@example.com', 'espectador_demo_01', ''),
+(2, 1, 'Carlos', NULL, 'Pérez', 'Ramírez', '200200002', 'espectador02@example.com', 'espectador_demo_02', ''),
+(3, 1, 'Luisa', 'Fernanda', 'Martínez', 'Díaz', '200200003', 'espectador03@example.com', 'espectador_demo_03', ''),
+(4, 1, 'Andrés', NULL, 'Rodríguez', 'Gómez', '200200004', 'espectador04@example.com', 'espectador_demo_04', ''),
+(5, 1, 'Natalia', 'Sofía', 'López', 'Castro', '200200005', 'espectador05@example.com', 'espectador_demo_05', ''),
+(6, 1, 'Felipe', NULL, 'Hernández', 'Ruiz', '200200006', 'espectador06@example.com', 'espectador_demo_06', ''),
+(7, 1, 'Sara', 'Isabel', 'Torres', 'Moreno', '200200007', 'espectador07@example.com', 'espectador_demo_07', ''),
+(8, 2, 'David', NULL, 'Vargas', 'Rojas', '200200008', 'espectador08@example.com', 'espectador_demo_08', ''),
+(9, 1, 'Manuela', 'Alejandra', 'Jiménez', 'Pardo', '200200009', 'espectador09@example.com', 'espectador_demo_09', ''),
+(10, 1, 'Miguel', NULL, 'Castillo', 'Reyes', '200200010', 'espectador10@example.com', 'espectador_demo_10', ''),
+(11, 1, 'Juliana', 'Paola', 'Cruz', 'Mendoza', '200200011', 'espectador11@example.com', 'espectador_demo_11', ''),
+(12, 1, 'Santiago', NULL, 'Ortiz', 'Vega', '200200012', 'espectador12@example.com', 'espectador_demo_12', ''),
+(13, 1, 'Gabriela', 'Lucía', 'Suárez', 'Herrera', '200200013', 'espectador13@example.com', 'espectador_demo_13', ''),
+(14, 1, 'Juan', NULL, 'Romero', 'Silva', '200200014', 'espectador14@example.com', 'espectador_demo_14', ''),
+(15, 1, 'Mariana', 'Isabel', 'Navarro', 'León', '200200015', 'espectador15@example.com', 'espectador_demo_15', ''),
+(16, 2, 'Nicolás', NULL, 'Mora', 'Acosta', '200200016', 'espectador16@example.com', 'espectador_demo_16', ''),
+(17, 1, 'Valentina', 'Andrea', 'Ríos', 'Peña', '200200017', 'espectador17@example.com', 'espectador_demo_17', ''),
+(18, 1, 'Samuel', NULL, 'Cárdenas', 'Ocampo', '200200018', 'espectador18@example.com', 'espectador_demo_18', ''),
+(19, 1, 'Isabella', 'Sofía', 'Mejía', 'Fuentes', '200200019', 'espectador19@example.com', 'espectador_demo_19', ''),
+(20, 1, 'Tomás', NULL, 'Salazar', 'Duarte', '200200020', 'espectador20@example.com', 'espectador_demo_20', ''),
+(21, 1, 'Camila', 'Fernanda', 'Prieto', 'Cortés', '200200021', 'espectador21@example.com', 'espectador_demo_21', ''),
+(22, 1, 'Emilio', NULL, 'Pineda', 'Aguilar', '200200022', 'espectador22@example.com', 'espectador_demo_22', ''),
+(23, 1, 'Daniela', 'María', 'Molina', 'Campos', '200200023', 'espectador23@example.com', 'espectador_demo_23', ''),
+(24, 2, 'Sebastián', NULL, 'Luna', 'Cabrera', '200200024', 'espectador24@example.com', 'espectador_demo_24', ''),
+(25, 1, 'Paula', 'Andrea', 'Arias', 'Serrano', '200200025', 'espectador25@example.com', 'espectador_demo_25', ''),
+(26, 1, 'Mateo', NULL, 'Vidal', 'Correa', '200200026', 'espectador26@example.com', 'espectador_demo_26', ''),
+(27, 1, 'Antonella', 'Isabel', 'Quintero', 'Bustos', '200200027', 'espectador27@example.com', 'espectador_demo_27', ''),
+(28, 1, 'Joaquín', NULL, 'Beltrán', 'Patiño', '200200028', 'espectador28@example.com', 'espectador_demo_28', ''),
+(29, 1, 'Renata', 'Lucía', 'Montoya', 'Soto', '200200029', 'espectador29@example.com', 'espectador_demo_29', ''),
+(30, 1, 'Esteban', NULL, 'Núñez', 'Navarrete', '200200030', 'espectador30@example.com', 'espectador_demo_30', '');
 
 INSERT INTO Pelicula (id_pelicula, id_clasificacion_pelicula, titulo, duracion, anio, pais_origen) VALUES
 (1, 1, 'La ciudad de los sueños', 110, 2022, 'Colombia'),
